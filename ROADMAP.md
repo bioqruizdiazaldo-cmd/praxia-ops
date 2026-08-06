@@ -19,6 +19,10 @@ Por eso cada línea lleva su estado de evidencia:
 
 Nada pasa a publicable hasta llegar a **Verificado**.
 
+> **Seguimiento.** Cada pendiente de esta hoja tiene su issue en el [tablero del roadmap](https://github.com/users/bioqruizdiazaldo-cmd/projects/2), etiquetado por estado de evidencia y por área. Esta página explica *por qué* algo falta; el tablero rastrea *cuándo* se resuelve.
+>
+> Los tres marcados [`bloqueante`](https://github.com/bioqruizdiazaldo-cmd/praxia-ops/issues?q=is%3Aissue+is%3Aopen+label%3Abloqueante) traban al resto: sin ambientes separados, sin workflows versionados y sin un ensayo de restauración, cualquier otra mejora se construye sobre algo que no se puede reproducir ni recuperar.
+
 ---
 
 ## Estado del sistema
