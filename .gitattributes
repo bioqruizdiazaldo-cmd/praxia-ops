@@ -1,0 +1,34 @@
+# Normalizar finales de línea: en el repositorio siempre LF, sin importar
+# desde qué sistema operativo se haya hecho el commit. Evita diffs que solo
+# cambian invisibles y hace reproducible el hash de cada archivo.
+* text=auto eol=lf
+
+# Archivos que dependen del sistema operativo donde se ejecutan
+*.ps1  text eol=crlf
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.sh   text eol=lf
+
+# Tipos explícitos
+*.md    text
+*.sql   text
+*.yml   text
+*.yaml  text
+*.json  text
+*.mjs   text
+*.js    text
+*.ts    text
+
+# Binarios: git no los toca
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.pdf   binary
+*.zip   binary
+*.woff  binary
+*.woff2 binary
+
+# Lo que no cuenta como código propio para las estadísticas de lenguaje
+docs/**      linguist-documentation
+artifacts/** linguist-documentation
