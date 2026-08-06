@@ -1,0 +1,53 @@
+# Sistemas operativos
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editores
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Estado local de agentes de IA
+.agents/
+.claude/
+.codex/
+CLAUDE.local.md
+
+# Secretos y configuración local — NUNCA versionar
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.pgpass
+id_rsa*
+id_ed25519*
+secrets/
+credenciales/
+
+# Exports crudos de runtime (pueden contener IDs de credenciales y chat_ids)
+*_all_workflows*.json
+*_backup_*.json
+backups/
+scratch/
+evidencia-cruda/
+
+# Datos reales
+*.dump
+*.sqlite
+*.db
+datos-reales/
+
+# Logs y temporales
+*.log
+*.jsonl
+*.tmp
+*.bak
+.cache/
+tmp/
+temp/
+node_modules/

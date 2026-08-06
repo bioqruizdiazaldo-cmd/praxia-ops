@@ -1,0 +1,131 @@
+name: Verificación
+
+# Dos controles que la política de publicación de este repo exige antes de cada cambio:
+# 1) que no se filtren secretos ni datos de infraestructura;
+# 2) que no haya enlaces internos rotos en la documentación.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  secretos:
+    name: Escaneo de secretos y datos prohibidos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Buscar patrones prohibidos
+        run: |
+          set -euo pipefail
+          fallo=0
+          buscar() {
+            local etiqueta="$1"; shift
+            local patron="$1"; shift
+            if grep -rInE --exclude-dir=.git --exclude-dir=.github "$patron" . > /tmp/hits.txt 2>/dev/null; then
+              echo "::error::Patrón prohibido detectado — $etiqueta"
+              cat /tmp/hits.txt
+              fallo=1
+            fi
+          }
+          # Claves privadas y tokens de proveedores conocidos
+          buscar "clave privada"            '-----BEGIN [A-Z ]*PRIVATE KEY-----'
+          buscar "token tipo OpenAI"        'sk-[A-Za-z0-9]{20,}'
+          buscar "token tipo GitHub"        'gh[pousr]_[A-Za-z0-9]{30,}'
+          buscar "token tipo Tavily"        'tvly-[A-Za-z0-9]{16,}'
+          buscar "cadena de conexión con contraseña" 'postgres(ql)?://[^:@/]+:[^@/]+@'
+          # Subdominios generados por proveedores de VPS/PaaS: revelan topología real
+          buscar "hostname de proveedor"    '\b(srv|vps|vm)[0-9]{4,}[.-][a-z0-9.-]+\.(cloud|net|com|io)\b'
+          # IPv4 pública embebida (se permiten loopback, RFC1918 y documentación)
+          if grep -rInoE --exclude-dir=.git --exclude-dir=.github \
+               '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' . \
+             | grep -vE ':(127\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.|0\.0\.0\.0|255\.|192\.0\.2\.|198\.51\.100\.|203\.0\.113\.|1\.1\.1\.1|8\.8\.8\.8)' \
+             | grep -vE '\b[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\b.*(versión|version|v[0-9])' > /tmp/ips.txt; then
+            if [ -s /tmp/ips.txt ]; then
+              echo "::error::Posible dirección IP pública en el repositorio"
+              cat /tmp/ips.txt
+              fallo=1
+            fi
+          fi
+          if [ "$fallo" -ne 0 ]; then
+            echo "El escaneo encontró contenido que la política de publicación prohíbe."
+            exit 1
+          fi
+          echo "Escaneo limpio."
+
+  enlaces:
+    name: Enlaces internos de la documentación
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar enlaces relativos
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, re, sys, urllib.parse
+          raiz = os.getcwd()
+          patron = re.compile(r'\[[^\]]*\]\(([^)]+)\)')
+          rotos = []
+          for base, dirs, files in os.walk(raiz):
+              dirs[:] = [d for d in dirs if d not in ('.git', 'node_modules')]
+              for nombre in files:
+                  if not nombre.endswith('.md'):
+                      continue
+                  ruta = os.path.join(base, nombre)
+                  texto = open(ruta, encoding='utf-8').read()
+                  # Ignorar el interior de bloques de código
+                  texto = re.sub(r'```.*?```', '', texto, flags=re.S)
+                  for destino in patron.findall(texto):
+                      destino = destino.split(' ')[0].strip()
+                      if destino.startswith(('http://', 'https://', 'mailto:', '#')):
+                          continue
+                      destino = urllib.parse.unquote(destino.split('#')[0])
+                      if not destino:
+                          continue
+                      absoluto = os.path.normpath(os.path.join(base, destino))
+                      if not os.path.exists(absoluto):
+                          rotos.append(f"{os.path.relpath(ruta, raiz)} -> {destino}")
+          if rotos:
+              print("::error::Enlaces internos rotos")
+              for r in sorted(set(rotos)):
+                  print("  " + r)
+              sys.exit(1)
+          print("Todos los enlaces internos resuelven.")
+          PY
+
+  sql:
+    name: SQL de artifacts ejecutable
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: verificacion
+          POSTGRES_DB: verificacion
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Aplicar los esquemas sintéticos en orden
+        env:
+          PGPASSWORD: verificacion
+        run: |
+          set -euo pipefail
+          for archivo in artifacts/sql/*.sql; do
+            echo "== $archivo"
+            psql -h localhost -U postgres -d verificacion \
+                 -v ON_ERROR_STOP=1 -f "$archivo"
+          done
+          echo "Los esquemas sintéticos aplican de corrido sobre PostgreSQL 16."
