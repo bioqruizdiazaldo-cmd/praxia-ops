@@ -2,6 +2,18 @@
 
 El sistema completo de punta a punta: qué recibe, quién decide, quién ejecuta, dónde queda el rastro y cómo vuelve la respuesta.
 
+> **In English** — The end-to-end architecture: what comes in, who decides, who executes, and where the trace
+> is left. A Telegram message reaches a self-hosted n8n runtime and passes two deterministic, LLM-free gates
+> before the model sees it — identity by `chat_id`, then a `Memory Intent Gate` written in code that decides
+> whether memory must be consulted first. The orchestrator either answers directly or delegates to a subagent
+> with its own contract and credentials; the web-search subagent returns one of seven typed states rather than
+> free text. Financial reads go through the finance API, never straight to the tables, because validation,
+> deduplication and audit live there. Four classes of action — send mail, delete, spend, publish — require an
+> explicit human yes, and approving a fiscal proposal records a decision without moving money. Failures are
+> caught by a global `errorWorkflow` writing to `praxia.agent_errors` with deduplication and anti-spam.
+
+<!-- fin del resumen en inglés -->
+
 ---
 
 ## La idea en un párrafo

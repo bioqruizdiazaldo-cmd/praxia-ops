@@ -35,6 +35,7 @@ Este repositorio documenta un sistema privado. Se aceptan contribuciones, con un
 - Español rioplatense en `docs/` y `systems/`; inglés en `docs/05-gobernanza/en/` y en `README.en.md`.
 - Markdown con línea en blanco antes de cada lista y después de cada encabezado.
 - Cada documento abre con un H1 y una frase que diga de qué va, y cierra con `> Última verificación: AAAA-MM-DD`.
+- Los documentos clave llevan, justo después de esa frase de apertura, un bloque `> **In English**` de seis a diez líneas, cerrado por el marcador `<!-- fin del resumen en inglés -->`. No es una traducción: es lo mínimo para que alguien que no lee español entienda de qué va la página y decida si le interesa. Si agregás un documento de peso, sumale el suyo.
 - Los ejemplos son sintéticos y se declara que lo son.
 - Si afirmás algo sobre el sistema, marcá su estado de evidencia con el vocabulario del repo: `Verificado`, `Confirmado por el responsable`, `Inferido`, `Pendiente de verificar`, `Historia incompleta`.
 

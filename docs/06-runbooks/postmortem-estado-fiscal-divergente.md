@@ -4,6 +4,18 @@ El 5 de agosto de 2026 se clasificaron 22 movimientos. Quedaron bien clasificado
 
 Este documento es **blameless**: describe cómo el diseño permitió la incoherencia, no quién la produjo. En un proyecto de una sola persona esa distinción importa todavía más, porque la alternativa es escribir un documento inútil.
 
+> **In English** — A blameless post-mortem of an incident in which two parts of the same system gave two
+> different answers to the same question and nothing raised an alarm. On 2026-08-05, 22 movements were left
+> with correct `ambito` and `deducible` but with `estado_fiscal` still at `sin_clasificar`, so a period could
+> not advance because of movements that were in fact already classified. The impact was mild, and the document
+> insists that was luck rather than design: the same root cause in the opposite direction would have let a
+> month close over unclassified movements with no visible symptom at all. Root cause — the truth lived in two
+> fields with nothing keeping them in sync, and there are at least four write paths to that table. Remediation
+> was migration v4.7, whose corrective UPDATE is explicitly non-reversible and whose verification block aborts
+> the deployment if it did not fix everything. Three of the ten corrective actions were still open.
+
+<!-- fin del resumen en inglés -->
+
 ## Ficha del incidente
 
 | Campo | Valor |

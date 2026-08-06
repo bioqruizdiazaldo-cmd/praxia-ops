@@ -2,6 +2,18 @@
 
 Qué existe hoy, qué falta, y qué haría falta para poder publicarlo sin faltar a la verdad.
 
+> **In English** — This is the project roadmap, and its purpose is to keep what was built apart from what was
+> only planned. Every row carries an evidence status — `Verificado`, `Parcial`, `Diseñado`, `No existe` — and
+> nothing counts as publishable until it reaches `Verificado`. Fifteen capabilities are listed as verified,
+> among them the orchestrator with specialised subagents, four-layer PostgreSQL memory, invariants enforced as
+> triggers and constraints in the database, and a 606-case test suite. Nine items are listed as missing, three
+> of them marked blocking: no separate staging environment (125 lab-named n8n workflows share one runtime with
+> 25 active ones), no n8n workflows versioned in git, and backups with neither an off-site copy nor a single
+> documented restore drill. Also absent: a harness that evaluates agent behaviour rather than code, and any
+> measurement of latency or cost per conversation.
+
+<!-- fin del resumen en inglés -->
+
 ---
 
 ## Cómo leer esta tabla

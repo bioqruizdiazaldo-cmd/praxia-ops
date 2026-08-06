@@ -2,6 +2,18 @@
 
 El Agente Fiscal escribe en una sola tabla que no mueve un peso, y no tiene la credencial para aprobar lo que escribe. La separación no descansa en que el agente se porte bien.
 
+> **In English** — How the fiscal agent is kept from acting on its own conclusions. It writes to exactly one
+> table, `praxia_finanzas.fiscal_propuestas`, which by construction cannot move a balance, and it does not
+> hold the credential that approves what it writes: `POST /api/fiscal-propuestas/decidir` returns 403 to the
+> fiscal token, evaluated first and by exact path match so no broader rule below can re-enable it by accident.
+> Approving records a human decision with signer and reason; it executes nothing financially, and applying the
+> change is a separate act with a different token. Three independent checks back this up, including a test
+> that reads the module's own source file and fails if an INSERT or UPDATE against any financial table ever
+> appears, plus a deployment script that aborts when the 403 does not show up. The trade-off is stated
+> plainly: nothing resolves itself, and a backlog of pending proposals can grow with nothing to flag it.
+
+<!-- fin del resumen en inglés -->
+
 ## Estado
 
 Vigente.

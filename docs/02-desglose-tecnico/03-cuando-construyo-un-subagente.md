@@ -2,6 +2,19 @@
 
 El criterio central de este repo: cuándo un dominio merece un subagente propio y cuándo alcanza con agregarle una herramienta más al orquestador.
 
+> **In English** — The repository's central engineering criterion: when a domain deserves its own subagent and
+> when it should stay a tool on the orchestrator. Five signals justify splitting — a prompt growing around one
+> domain, a different permission scope, its own human approval step, testability in isolation, reuse — and the
+> costs are listed rather than assumed: latency, a contract to maintain, separate versioning, harder
+> observability, duplicated context, one more artefact that can sit inactive or hold an expired credential.
+> The system's own inventory is shown with the signal that justified each split; the email agent is physically
+> separate from the workflow that sends, so the irreversible action sits on the far side of the human yes. The
+> page also carries a definition template you must be able to complete before building, including an
+> acceptance criterion declared before the tests run, and an honest note that the subagent count could be 14,
+> 15 or 17 depending on how you count — left marked as unverified rather than resolved to the nicest number.
+
+<!-- fin del resumen en inglés -->
+
 ## Criterio
 
 La pregunta se plantea mal casi siempre. No es "¿cuántos agentes necesito?" sino "¿qué gano separando, y qué pago?".

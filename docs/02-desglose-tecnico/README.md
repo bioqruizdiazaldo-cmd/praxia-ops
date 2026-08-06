@@ -2,6 +2,18 @@
 
 Esta sección no explica *qué hace* el sistema (eso está en el [manual de usuario](../00-manual-de-usuario/)) ni *cómo está armado* (eso está en [arquitectura](../01-arquitectura/)). Explica **el criterio de decisión**: frente a un problema concreto, por qué la solución terminó siendo una constraint de PostgreSQL y no un `if` en un prompt, por qué un subagente y no una herramienta más en el orquestador, por qué una API propia y no un BaaS.
 
+> **In English** — This section documents the decision criteria behind the stack rather than the stack itself:
+> why a given rule ended up as a PostgreSQL constraint instead of a line in a prompt, why a subagent instead
+> of one more tool, why a hand-written HTTP API instead of a backend-as-a-service. Its centrepiece is a
+> decision matrix mapping each kind of need to the tool chosen, the reason, and a real example in the system.
+> Two rules run through everything: the lowest layer that can guarantee something is the layer that guarantees
+> it — the prompt is the last resort, not the first — and every extra layer is paid for in latency, contract
+> and versioning. The supporting numbers are stated openly: 217 registered n8n workflows of which 25 are
+> active, 606 passing tests, 22 MCP tools across 4 OAuth scopes, 60+ HTTP endpoints with no `DELETE`, and 26
+> stored memory facts — the last of which is the entire reason there is no vector database here.
+
+<!-- fin del resumen en inglés -->
+
 ## Para quién es
 
 Para alguien que construye sistemas agénticos y necesita decidir lo mismo. Cada archivo tiene la misma estructura:

@@ -4,6 +4,18 @@ El Agente Fiscal es la capa de interpretación fiscal que se apoya sobre [PraxIA
 
 **Estado:** producción · **Corte de esta ficha:** 2026-08-06
 
+> **In English** — Reference sheet for the fiscal subsystem: a read-only interpretation layer over PraxIA
+> Finanzas that reads already-recorded financial evidence, checks it against the taxpayer's regime and
+> calendar, and produces diagnoses and proposals. It never corrects, imputes, pays or files. Its only write
+> target is `fiscal_propuestas`, and the separation from approval is a credential it does not hold — a hard
+> 403 on the decision route, verified by a script that aborts the deployment if it is missing. Proposals cite
+> verifiable precedents from the owner's own earlier decisions instead of inferring intent; two separate
+> hashes stop the agent from re-asking a settled question or approving against evidence that has since
+> changed; and when a detector fails the answer is a coded abstention rather than a partial result. Current
+> state: schema v4.13, 39 tables, 606 passing tests, 9 read operations, 13 detectors, monthly trigger a stub.
+
+<!-- fin del resumen en inglés -->
+
 ---
 
 ## Qué decide y qué NO decide

@@ -4,6 +4,18 @@ Reconstrucción día por día de la construcción de PraxIA Ops, del 10 de julio
 
 Cada fila declara el estado de su evidencia. Ver [cómo leer las tablas](README.md#cómo-leer-las-tablas) si venís directo a este archivo.
 
+> **In English** — A day-by-day reconstruction of how the system was built between 10 July and 6 August 2026,
+> grouped into four stages, with an evidence status on every row. The orchestrator was created on 2026-07-14
+> at 23:05; persistent PostgreSQL memory replaced Supabase in practice four days later; the global error
+> workflow was linked on 2026-07-22. Three episodes that recur throughout the repository all appear here: a
+> 21.9 MB PDF broke execution 1292 on 2026-07-25 and exposed a pipeline that modelled only success; the
+> general search agent scored 2 of 7 against a declared 7/7 threshold on 2026-07-27 and was not published; and
+> on 2026-07-28 a checkpoint found 3275 lines of JavaScript and 33 SQL migrations running in production with
+> no version control at all. The final stage covers five days of silent drift between repository and server,
+> found on 2026-08-05. Nothing across these 28 days happened outside production.
+
+<!-- fin del resumen en inglés -->
+
 ---
 
 ## Etapa 1 — Laboratorio (10 al 14 de julio)

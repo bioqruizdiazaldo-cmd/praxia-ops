@@ -2,6 +2,18 @@
 
 Pasó 2 de 7 pruebas contra una exigencia declarada de 7/7. Estaba construido, funcionaba y no se publicó. Es la decisión más importante de este repositorio.
 
+> **In English** — The decision not to publish a finished component. The "Buscador General" — a broader web
+> search agent with relevance scoring, a consolidated validator and a coverage metric — scored 2 of 7 on a
+> case matrix frozen before the run, against a pass threshold of 7/7 declared in advance. It was not
+> published, and the fixtures were not adjusted: the recorded diagnosis is that the four failures were not
+> false positives of the new validator but cases that genuinely lacked enough evidence for a grounded answer.
+> Lowering the bar to 5/7 and shipping it labelled "experimental" were both considered and rejected — the
+> label protects the author, not the reader. The narrower Tavily V1 stays in production with seven typed
+> output states, including `no_reliable_source` and `insufficient_evidence`. The underlying asymmetry: the
+> cost of not shipping is visible and bounded, the cost of shipping unsupported answers is open-ended.
+
+<!-- fin del resumen en inglés -->
+
 ## Estado
 
 Rechazada.

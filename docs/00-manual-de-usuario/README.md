@@ -2,6 +2,18 @@
 
 Este manual explica cómo se usa el sistema desde afuera: qué se le puede pedir, qué devuelve, qué no hace y qué hacer cuando algo falla.
 
+> **In English** — This is the index of the end-user manual: nine chapters on how the system is operated from
+> the outside, not on how it is built. It covers what you can ask Oppenheimer over Telegram (text, voice,
+> image, PDF), what each subagent does and with which permissions, how movements are recorded and queried in
+> PraxIA Finanzas, what the memory layer may store and what it must refuse, which routines run unattended and
+> at what time, and how the monthly fiscal diagnosis and its proposals are decided. Content is cut at
+> 2026-08-05; anything that could not be checked against the running system is marked
+> `[PENDIENTE DE VERIFICAR]` instead of being filled in with a guess. The page closes with a deliberate
+> warning: production was also used as a laboratory, there is no real environment separation, backups have no
+> off-site copy or proven restore, and on 2026-08-05 the server was found three migrations behind the repo.
+
+<!-- fin del resumen en inglés -->
+
 ## Para quién es
 
 Para la persona que **usa** el sistema, no para quien lo construye.

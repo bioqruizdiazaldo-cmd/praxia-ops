@@ -4,6 +4,18 @@ Adónde va el sistema, en qué orden, y —lo más importante— qué evento con
 
 Este documento no es una lista de deseos. Cada ítem tiene tres cosas: **qué falta**, **por qué importa** y **qué lo dispara**. Sin disparador, un TO-BE es una carta a los Reyes.
 
+> **In English** — The target state, written as a constraint rather than a wish list: each of the ten gaps
+> states what is missing, why it matters, and the concrete event that triggers it. The inversion at its centre
+> is quoted from the project itself — versioned code and workflows should be the source of truth and the
+> runtime should be a deployment; today it is the other way round. The prioritised table puts point-fix
+> security debts first (a token left in a cloud-synced `.env`, insecure hardcoded defaults in the MCP server),
+> then git-versioned workflows, workflow manifests with eleven mandatory fields, off-site backup, and a
+> restore drill actually executed and measured. None of those five adds a feature, which is the point. Row
+> Level Security is deliberately deferred until a second data owner exists. The page also lists what is
+> explicitly out of scope: vector RAG, a backend framework, a dashboard rewrite, and more agents.
+
+<!-- fin del resumen en inglés -->
+
 ---
 
 ## La frase que define el objetivo

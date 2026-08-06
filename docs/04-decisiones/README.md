@@ -2,6 +2,16 @@
 
 Las trece decisiones que explican por qué este sistema es como es — incluida la de no publicar un componente terminado.
 
+> **In English** — Index of the thirteen architecture decision records that explain why the system is shaped
+> the way it is, each with its status: accepted, superseded, rejected, or standing. If you read only one, read
+> ADR-006 — the decision not to publish a component that was already built and working, because it scored 2 of
+> 7 against a threshold of 7/7 declared in advance. It is the only one of the thirteen that produced no
+> deliverable. The last four form a block around the fiscal subsystem and answer four versions of the same
+> question — how to put a brake on an agent operating on something that matters: what it may write, what its
+> claims rest on, where invariants are enforced, and what it does when it cannot fully answer.
+
+<!-- fin del resumen en inglés -->
+
 ## Qué es un ADR y por qué están acá
 
 Un ADR (*Architecture Decision Record*) es el registro de una decisión de diseño con su contexto, sus alternativas y sus consecuencias. No es documentación de la solución: es documentación **del momento en que se eligió**, con la información que había entonces.

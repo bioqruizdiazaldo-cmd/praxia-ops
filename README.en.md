@@ -36,6 +36,7 @@ This repository is the sanitised, verifiable documentation of that work. The run
 - [Governance](docs/05-gobernanza/) — the AI-assisted delivery lifecycle, templates and checklists
 - [Runbooks](docs/06-runbooks/) — operations, incidents, post-mortems
 - [Fiscal agent](systems/praxia-agente-fiscal/) — a read-only contract, precedent-based proposals and a hard 403: the agent proposes, it never applies, and the separation is a credential it does not hold
+- Key documents open with an `> **In English**` summary block, so you can tell what a page covers without reading Spanish; the governance guide is also available in full in English at [`docs/05-gobernanza/en/`](docs/05-gobernanza/en/)
 
 Documentation is written in Spanish (Argentina); the governance guides in `docs/05-gobernanza` are available in English.
 

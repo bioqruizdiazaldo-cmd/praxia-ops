@@ -4,6 +4,18 @@ Oppenheimer es el asistente personal de Aldo: un agente n8n autohospedado con ca
 
 **Estado:** producción · **Corte de esta ficha:** 2026-08-05
 
+> **In English** — Reference sheet for Oppenheimer, the personal agent in production: a self-hosted n8n
+> orchestrator on a Telegram channel, with specialised subagents doing the real work against Gmail, Calendar,
+> Drive, Sheets, the web and PostgreSQL memory. Identity is resolved in the very first node by `chat_id`,
+> before a single model token is spent. Whether memory must be consulted is decided in code rather than by the
+> LLM, and the system prompt forbids answering "I have no record of that" without having queried memory first
+> and received an empty result. The web search subagent emits one of seven typed states, so missing evidence
+> is declared instead of filled in. Runtime figures at the 2026-08-03 cut: 217 registered workflows, 25
+> active, 125 with lab naming, and an orchestrator that grew from 37 to 51 nodes in twenty days. Nine known
+> limits are listed, along with twenty minimum tests, three of them regressions from real incidents.
+
+<!-- fin del resumen en inglés -->
+
 ---
 
 ## Objetivo

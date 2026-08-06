@@ -2,6 +2,18 @@
 
 La regla estaba escrita en el código y no alcanzó, porque el código no es el único camino a la base. Lo que tiene que ser siempre cierto se garantiza donde pasan todos los caminos.
 
+> **In English** — Why the invariants in this system live in PostgreSQL rather than in application code. On
+> 2026-08-05, 22 movements ended up correctly classified in `ambito` and `deducible` while their
+> `estado_fiscal` marker stayed at `sin_clasificar`: the agent saw them as classified, `cierre_chequeos()`
+> kept flagging them as blockers, and nothing raised an error. The same day a function guarding the closing
+> state machine was found never to have executed — an HTTP route issued a direct UPDATE, so a freshly opened
+> period could be marked as filed. The fix was migration v4.7: `estado_fiscal` became a derived value enforced
+> by trigger, the transition graph moved into the database, and the corrective migration verifies itself with
+> a `DO $$` block that raises and aborts if any incoherent row survives. The declared cost is logic split
+> across `.mjs` and `.sql`, mitigated by a test that fails if the two copies of the graph diverge.
+
+<!-- fin del resumen en inglés -->
+
 ## Estado
 
 Vigente.
