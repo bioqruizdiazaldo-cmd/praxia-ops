@@ -41,7 +41,7 @@ Tres reglas que valen más que cualquier framework:
 
 ## En este sistema
 
-**554 casos de test en 27 archivos**, con `node --test` (el runner nativo de Node, sin framework — coherente con la API sin framework) y un **harness con PGlite que replica el esquema real**.
+**606 casos de test en verde, 0 salteados**, con `node --test` (el runner nativo de Node, sin framework — coherente con la API sin framework) y un **harness con PGlite que replica el esquema real**.
 
 ### Por qué PGlite
 
@@ -52,11 +52,11 @@ Lo que eso compra:
 - **Se testea lo que corre.** El trigger `prohibir_delete_fisico` se prueba intentando un `DELETE` de verdad y verificando que la base lo rechace.
 - **Aislamiento por test.** Cada caso puede arrancar con una base limpia. Sin estado compartido, sin orden implícito, sin el test que sólo pasa si corre segundo.
 - **Sin infraestructura.** No hace falta Docker ni un servidor levantado. `node --test` y listo. En un proyecto de una persona, la fricción determina si los tests se corren o no.
-- **Las migraciones son testeables.** Hay casos específicos para **v4.6 y v4.7**. Una migración probada antes de tocar producción es una clase entera de incidentes que no ocurre.
+- **Las migraciones son testeables.** Hay casos específicos para **v4.6, v4.7 y v4.9**. El de la v4.7 obligó a excluirla del arnés común, porque su prueba necesita sembrar el estado incoherente *antes* de aplicar la migración que lo corrige. Una migración probada antes de tocar producción es una clase entera de incidentes que no ocurre.
 
 Los límites, para ser honesto: PGlite no es idéntico a un PostgreSQL de producción en extensiones, concurrencia ni performance. No sirve para probar comportamiento bajo carga ni bloqueos. Para lógica de esquema —que es el 95% de lo que hay que probar acá— alcanza y sobra.
 
-### Qué cubren los 554 casos
+### Qué cubren los 606 casos
 
 Por área, según el inventario verificado:
 
@@ -74,9 +74,11 @@ Por área, según el inventario verificado:
 | Auto-confirmación | Cuándo se confirma solo y cuándo no |
 | Reporte mensual | Agregaciones |
 | Exportación del dashboard | El dato que sale |
-| Migraciones | v4.6 y v4.7 |
+| Migraciones | v4.6, v4.7 y v4.9 |
 | Lectura fiscal | En JS **y en SQL** |
-| Propuestas fiscales | Máquina de estados de v4.8 |
+| Propuestas fiscales | Máquina de estados de v4.8, huellas y caducidad por evidencia cambiada |
+| Motor de precedentes | Precedentes concordantes, contradictorios y ausentes; confianza que nunca llega a 1 |
+| Catálogo de obligaciones | Feriados, fines de semana, día fijo contra terminación de CUIT, faltantes por régimen |
 | Delegación de rutas fiscales | Que la ruta llegue al handler correcto |
 | Herramientas MCP | Las 22, con sus scopes |
 | Integración Oppenheimer↔finanzas | El camino completo |
@@ -86,6 +88,26 @@ Dos entradas merecen comentario.
 **"Normalización de montos, incluidos los ambiguos".** `1.500` en Argentina puede ser mil quinientos o uno coma cinco. Es la clase de ambigüedad que en un sistema financiero produce un error de factor 1000. Que tenga tests propios dice que se detectó como problema antes de que costara plata.
 
 **"Lectura fiscal en JS y en SQL".** La misma capa se prueba de los dos lados: que el endpoint devuelva lo correcto **y** que la vista subyacente calcule lo correcto. Es el reconocimiento explícito de que la lógica está repartida entre dos lenguajes y ninguno de los dos alcanza solo.
+
+### El test que lee su propio archivo fuente
+
+Hay un caso que vale documentar aparte porque es poco común y resuelve un problema que ningún test de comportamiento resuelve bien.
+
+El módulo de propuestas fiscales declara en su cabecera que escribe en **una sola tabla**:
+
+> *"Este módulo escribe en UNA tabla: `fiscal_propuestas`. No toca movimientos, deudas, obligaciones ni cierres, y hay una prueba que lo verifica leyendo este archivo."*
+
+La prueba se llama `el módulo no escribe en ninguna tabla financiera` y hace literalmente eso: **abre el archivo fuente del módulo como texto y falla si encuentra un `INSERT` o un `UPDATE` sobre alguna tabla financiera.** No ejercita el código: lo inspecciona.
+
+Por qué esto y no un test funcional:
+
+- **Un test de comportamiento prueba los caminos que se te ocurrieron.** Se puede verificar que aprobar una propuesta no cambie el movimiento de origen —y hay un test que lo hace, `aprobar no cambió el movimiento de origen`—, pero eso cubre *ese* camino. El atajo que alguien agregue el mes que viene entra por otro.
+- **La garantía que interesa es sobre el módulo entero, no sobre una ejecución.** "Este archivo no escribe en tablas financieras" es una propiedad estática. Verificarla estáticamente es lo natural; verificarla ejecutando es aproximarla.
+- **Falla en el momento correcto.** El comentario del proyecto lo dice sin vueltas: *"si mañana alguien agrega el atajo de 'aplicar al aprobar', falla"*. El test rompe en el commit que introduce el atajo, no seis meses después cuando alguien nota que una aprobación movió plata.
+
+El mismo patrón aparece dos veces más en la suite: un test lee `server.mjs` y verifica que **importe** los handlers fiscales en vez de reescribirlos —el bug real que existió fue justamente ese, un `server.mjs` que no importaba `fiscal.mjs` y dejaba 23 funciones muertas—, y otro compara el grafo de transiciones declarado en JavaScript contra el que impone el trigger de la base, fallando si divergen.
+
+Es barato de escribir, no necesita infraestructura y cubre una clase de regresión —"alguien agregó una escritura donde no debía haberla"— que ningún fixture detecta. La contracara honesta: es sensible a cómo está escrito el código, no a lo que hace. Un `INSERT` armado por concatenación en tiempo de ejecución se le escapa. Sirve como red contra el atajo distraído, no contra el bypass deliberado.
 
 ### Fixtures sintéticos
 
@@ -176,4 +198,4 @@ Declararlo es parte del método.
 
 Empujá la lógica hacia lo determinístico y testeala con una base real embebida, no con mocks: si la regla vive en un trigger, el mock nunca la va a probar. Declará el umbral antes de correr las pruebas, y cuando un caso falle, revisá el caso antes de aflojar el criterio.
 
-> Última verificación: 2026-08-05
+> Última verificación: 2026-08-06

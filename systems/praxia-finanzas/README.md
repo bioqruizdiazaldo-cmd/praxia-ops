@@ -1,8 +1,8 @@
 # PraxIA Finanzas — contrato universal, invariantes en la base y núcleo fiscal
 
-PraxIA Finanzas es el sistema financiero y fiscal de PraxIA Ops: un esquema PostgreSQL con las reglas grabadas como triggers, una API sin framework, un dashboard de un solo archivo, un servidor MCP con scopes y 554 tests. No se borra nada, no se inventa nada, y todo entra por la misma puerta.
+PraxIA Finanzas es el sistema financiero y fiscal de PraxIA Ops: un esquema PostgreSQL con las reglas grabadas como triggers, una API sin framework, un dashboard de un solo archivo, un servidor MCP con scopes y 606 tests. No se borra nada, no se inventa nada, y todo entra por la misma puerta.
 
-**Estado:** producción · **Corte de esta ficha:** 2026-08-05
+**Estado:** producción · **Corte de esta ficha:** 2026-08-06
 
 ---
 
@@ -91,7 +91,7 @@ Verificado en código, no aspiracional.
 | Orquestación | n8n, 9 workflows. Telegram como canal principal |
 | Despliegue | Docker Compose + Traefik con TLS. **Sin puertos publicados al host** |
 | MCP | Servidor aparte en TypeScript: Express + `@modelcontextprotocol/sdk` + SSE + OAuth/JWT/PKCE |
-| Tests | `node --test`, 27 archivos, **554 casos**, harness con **PGlite** que replica el esquema real |
+| Tests | `node --test`, **606 casos verdes, 0 salteados**, harness con **PGlite** que replica el esquema real |
 
 ### Versiones al corte
 
@@ -99,11 +99,11 @@ Verificado en código, no aspiracional.
 |---|---|
 | Paquete | `praxia-contable@0.2.0` |
 | OpenAPI declarado | PraxIA Finanzas 3.6.0 |
-| Esquema de base | **v4.8** |
+| Esquema de base | **v4.13** (39 tablas) |
 | Contrato Finanzas↔Fiscal | v1.0, aprobado 2026-08-04 |
 | Servidor MCP | `praxia-finanzas-mcp@1.0.0` |
 
-La divergencia entre la versión que declara OpenAPI (3.6.0) y la del esquema (4.8) es real y está anotada como deuda más abajo.
+La divergencia entre la versión que declara OpenAPI (3.6.0) y la del esquema (4.13) es real y está anotada como deuda más abajo.
 
 ---
 
@@ -204,32 +204,21 @@ Escrita el 2026-07-28 y puesta en pausa; incorporada después.
 
 **Identidad de ocurrencia: `(plantilla_id, occurrence_key)`.** Esa clave es lo que impide que el generador cree dos veces el alquiler de agosto si se lo corre dos veces.
 
-### v4.7 — Estado fiscal derivado (2026-08-05)
+### v4.7 → v4.13 — La serie del Agente Fiscal (2026-08-05/06)
 
-| Función | Para qué |
-|---|---|
-| `movimiento_estado_fiscal_derivado` | `estado_fiscal` **ya no puede divergir** de `ambito` + `deducible`: se deriva, no se declara |
-| `cierre_transicion_valida` | Un cierre sólo puede pasar por transiciones legales de su máquina de estados |
+Las últimas siete migraciones son el subsistema fiscal completo. Acá va sólo el inventario de objetos; el diseño, las citas, los umbrales, la máquina de estados y los límites están documentados aparte en [`systems/praxia-agente-fiscal`](../praxia-agente-fiscal/).
 
-Es la clase de bug que aparece a los tres meses: alguien cambia `ambito` y se olvida de `estado_fiscal`. Con la derivación, no hay dos fuentes que sincronizar.
+| Versión | Fecha | Qué agrega |
+|---|---|---|
+| v4.7 | 2026-08-05 | `movimiento_estado_fiscal_derivado` — `estado_fiscal` se deriva de `ambito` + `deducible` y ya no puede divergir — y `cierre_transicion_valida`, que impide que un cierre salte etapas. Ver el [post-mortem](../../docs/06-runbooks/postmortem-estado-fiscal-divergente.md) |
+| v4.8 | 2026-08-05 | `fiscal_propuestas` con los triggers `propuesta_nace_pendiente`, `propuesta_contenido_inmutable` y `propuesta_transicion_valida`, más los campos `huella` y `huella_evidencia`. `fiscal_motor.mjs` propone por precedente del dueño. Ver [propuestas y huellas](../praxia-agente-fiscal/propuestas-y-huellas.md) y [motor de precedentes](../praxia-agente-fiscal/motor-de-precedentes.md) |
+| v4.9 | 2026-08-05/06 | Contribuyentes con FK obligatoria: `regimen_vigente()`, `perfil_fiscal_sin_solapamiento()`, `imputacion_mismo_contribuyente()` |
+| v4.10 | 2026-08-05/06 | Plantillas recurrentes completas, con máquina de estados propia |
+| v4.11 | 2026-08-05/06 | `catalogo_obligaciones`, `dias_no_habiles`, `terminacion_cuit`, `vencimiento_habil()` y `vencimiento_de_obligacion()` |
+| v4.12 | 2026-08-05/06 | Feriados 2026 |
+| v4.13 | 2026-08-05/06 | Un régimen `historico` sigue siendo válido: `regimen_vigente()` deja de exigir `estado='vigente'` |
 
-### v4.8 — Propuestas fiscales (2026-08-05)
-
-| Objeto | Para qué |
-|---|---|
-| `fiscal_propuestas` | Propuestas de clasificación que el agente eleva a decisión humana |
-| Trigger `propuesta_nace_pendiente` | Ninguna propuesta nace aprobada |
-| Trigger `propuesta_contenido_inmutable` | El contenido propuesto no se puede editar después de creado |
-| Trigger `propuesta_transicion_valida` | Sólo transiciones legales de estado |
-| Campos `huella`, `huella_evidencia` | No insistir con lo mismo; no aprobar algo caducado |
-
-`fiscal_motor.mjs` (2026-08-05) define de dónde aprende el agente:
-
-> *"De las decisiones anteriores de Aldo. De ningún otro lado. El agente mejora a medida que Aldo decide, sin que nadie lo reentrene. Y el primer mes propone poco, que es lo correcto — todavía no sabe nada."*
-
-Y el campo `huella` responde a un riesgo escrito con todas las letras:
-
-> *"Un agente que puede repreguntar sin límite termina consiguiendo el 'sí' por cansancio."*
+La v4.7 resuelve la clase de bug que aparece a los tres meses: alguien cambia `ambito` y se olvida de `estado_fiscal`. Con la derivación, no hay dos fuentes que sincronizar.
 
 ---
 
@@ -270,7 +259,7 @@ Todos exigen token. **Ninguno es `DELETE`.**
 | **Propuestas fiscales** | El agente propone, la persona decide | `POST\|GET /api/fiscal-propuestas` · `POST /api/fiscal-propuestas/decidir` |
 | **Diagnóstico fiscal** | Consistencia del subsistema | `GET /api/fiscal-diagnostico` |
 
-La **capa de lectura fiscal** merece una nota: son nueve operaciones exclusivamente de lectura, con su contrato aprobado el 2026-08-04. Es la superficie que consume el motor fiscal. Que sea solo-GET es el aislamiento: el subsistema que propone no puede escribir.
+Las tres últimas familias —capa de lectura, propuestas y diagnóstico— son la superficie del Agente Fiscal: nueve operaciones exclusivamente de lectura bajo un contrato aprobado el 2026-08-04, una tabla de propuestas que no mueve un peso, y un token que recibe **403** al intentar aprobar. El detalle está en [`systems/praxia-agente-fiscal`](../praxia-agente-fiscal/).
 
 Descripción del contrato y fragmento OpenAPI sintético en [`artifacts/openapi/README.md`](../../artifacts/openapi/README.md).
 
@@ -320,7 +309,7 @@ Existe además un **prototipo Dashboard UI v3** —obligaciones recurrentes, 17 
 
 ---
 
-## Tests — 554 casos en 27 archivos
+## Tests — 606 casos verdes, 0 salteados
 
 `node --test` con un harness de **PGlite que replica el esquema real**. No son mocks de una base imaginaria: es el DDL versionado corriendo en memoria.
 
@@ -344,7 +333,7 @@ Cobertura declarada:
 - Herramientas MCP.
 - Integración Oppenheimer ↔ finanzas.
 
-Hito intermedio verificado: **141/141** al cerrar la Fase 3 el 2026-07-28.
+Hito intermedio verificado: **141/141** al cerrar la Fase 3 el 2026-07-28. De los 606 casos, **~196 son directamente fiscales** y están repartidos en 11 archivos — detalle en [`systems/praxia-agente-fiscal`](../praxia-agente-fiscal/).
 
 ---
 
@@ -370,9 +359,9 @@ Cada una tiene su contraparte técnica: la primera es el esquema único; la segu
 
 ## Límites conocidos y deuda técnica
 
-1. **OpenAPI declara 3.6.0 y el esquema está en v4.8.** El contrato publicado va atrás del sistema real.
+1. **OpenAPI declara 3.6.0 y el esquema está en v4.13.** El contrato publicado va atrás del sistema real.
 2. **Drift entre repositorio y servidor.** El 2026-08-05 se descubrió que producción estaba **tres migraciones atrás desde el 31/07**, porque *"nadie había mirado el servidor, solo el repositorio"*. La puesta al día se hizo con backup verificado, migraciones con `ON_ERROR_STOP=1` en transacción y verificación de no-regresión (25 → 35 tablas). Ver el [post-mortem](../../docs/06-runbooks/postmortem-drift-produccion.md).
-3. **Sin integración continua.** Los 554 tests se corren a mano antes de publicar.
+3. **Sin integración continua.** Los 606 tests se corren a mano antes de publicar.
 4. **Sin separación de ambientes.** No hay staging. El TO-BE lo pide.
 5. **Dashboard UI v3 aprobado y no migrado.** Fase 6 pendiente; toca el archivo único de 1.911 líneas.
 6. **El router por regex en un archivo de ~70 KB** es mantenible hoy y es un punto de atención hacia adelante.
@@ -398,7 +387,7 @@ Cada una tiene su contraparte técnica: la primera es el esquema único; la segu
 9. **Ninguna propuesta del agente nace aprobada**, su contenido es inmutable y su estado sigue la máquina.
 10. **Ningún dato sensible sale hacia el modelo sin reemplazo** por `placeholder_token`.
 11. **Toda migración se aplica con backup verificado, en transacción, con `ON_ERROR_STOP=1` y verificación de no-regresión de tablas.**
-12. **554/554 tests en verde** antes de publicar.
+12. **606/606 tests en verde, 0 salteados** antes de publicar.
 13. **El servidor y el repositorio coinciden.** Se verifica `schema_migrations` **en el servidor**, no en el repositorio.
 
 ---
@@ -431,13 +420,14 @@ Cada una tiene su contraparte técnica: la primera es el esquema único; la segu
 | 22 | Llamada MCP con scope `praxia.read` a `confirmar_movimiento` | Denegada |
 | 23 | Llamada MCP sin token | Denegada |
 | 24 | Cierre fiscal saltando una etapa | Rechazado por `cierre_transicion_valida` |
-| 25 | Correr la suite completa | 554/554 en verde sobre PGlite con el DDL real |
+| 25 | Correr la suite completa | 606/606 en verde, 0 salteados, sobre PGlite con el DDL real |
 | 26 | Comparar `schema_migrations` del servidor contra el repositorio | Idénticos. Esta es la prueba que faltaba el 05/08 |
 
 ---
 
 ## Documentos relacionados
 
+- [PraxIA Agente Fiscal — la capa que lee este sistema y nunca lo escribe](../praxia-agente-fiscal/)
 - [Guía de uso de PraxIA Finanzas](../../docs/00-manual-de-usuario/04-praxia-finanzas-guia-de-uso.md)
 - [Cuándo uso una API propia](../../docs/02-desglose-tecnico/05-cuando-uso-una-api-propia.md)
 - [Cuándo uso un MCP](../../docs/02-desglose-tecnico/04-cuando-uso-un-mcp.md)
@@ -448,4 +438,4 @@ Cada una tiene su contraparte técnica: la primera es el esquema único; la segu
 - [Artefactos SQL](../../artifacts/sql/)
 - [Contrato de la API](../../artifacts/openapi/)
 
-> Última verificación: 2026-08-05
+> Última verificación: 2026-08-06

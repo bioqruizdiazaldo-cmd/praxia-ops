@@ -53,7 +53,7 @@ Cada flecha punteada es una compuerta. No se pasa de fase porque haya ganas: se 
 
 **Qué es:** VPS 24/7, dominio, HTTPS, PostgreSQL, backups, Oppenheimer estable.
 
-**Qué ya está:** VPS con Docker y Traefik con TLS, sin puertos publicados al host. PostgreSQL 16 en contenedor propio, sólo en loopback. SSH cerrado tras el despliegue verificado del 2026-07-23. `errorWorkflow` global con deduplicación. Backups diarios, semanales y mensuales con lock, `manifest.json` y `restore_check.sh`. Finanzas con 554 tests y migraciones en transacción.
+**Qué ya está:** VPS con Docker y Traefik con TLS, sin puertos publicados al host. PostgreSQL 16 en contenedor propio, sólo en loopback. SSH cerrado tras el despliegue verificado del 2026-07-23. `errorWorkflow` global con deduplicación. Backups diarios, semanales y mensuales con lock, `manifest.json` y `restore_check.sh`. Finanzas con 606 tests y migraciones en transacción.
 
 **Qué falta para cerrar la fase:**
 

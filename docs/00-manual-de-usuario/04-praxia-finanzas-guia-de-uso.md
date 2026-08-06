@@ -277,7 +277,7 @@ Desde la v4.7 existe la función `movimiento_estado_fiscal_derivado`: el `estado
 
 ### Las propuestas del agente
 
-Esto es lo más nuevo: la v4.8 (2026-08-05) agregó `fiscal_propuestas`.
+La v4.8 (2026-08-05) agregó `fiscal_propuestas`. Cómo se usa en el día a día está en el [capítulo 09](09-agente-fiscal-guia-de-uso.md).
 
 **Cómo funciona.** El motor (`fiscal_motor.mjs`) mira cómo clasificaste antes y propone cómo clasificar lo nuevo. Textual:
 
@@ -357,10 +357,10 @@ Para que sepas qué esperar.
 |---|---|
 | Versión de la app | `praxia-contable@0.2.0` |
 | Versión declarada en OpenAPI | PraxIA Finanzas 3.6.0 |
-| Esquema de base | v4.8 |
+| Esquema de base | v4.13 |
 | Contrato Finanzas↔Fiscal | v1.0, aprobado 2026-08-04 |
 | Servidor MCP | `praxia-finanzas-mcp@1.0.0` |
-| Tests | **554 casos en 27 archivos**, con harness PGlite que replica el esquema real |
+| Tests | **606 casos en verde, 0 salteados**, con harness PGlite que replica el esquema real |
 
 Los tests cubren: ingesta, normalización de montos (incluidos los ambiguos y el separador decimal), fechas y "mes pedido", tipo de cambio, sanitización, datos sensibles, transferencias y su guard, los cuatro adaptadores, deudas y pagos, auto-confirmación, reporte mensual, exportación del dashboard, migraciones v4.6 y v4.7, lectura fiscal, propuestas fiscales, delegación de rutas, herramientas MCP e integración con Oppenheimer.
 

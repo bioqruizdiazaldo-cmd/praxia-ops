@@ -115,7 +115,7 @@ Es la diferencia entre "tengo el JSON guardado" y "sé qué es esto, quién lo m
 - **Los workflows de n8n siguen sin versionar al corte.** Es el hueco más grande y el que más contradice el título de este ADR. Se declara.
 - **Sigue habiendo un solo ambiente.** Todo pasa en producción. Los inventarios, canaries y backups mitigan; no reemplazan.
 - **125 workflows de laboratorio siguen en el runtime.** El inventario del 25/07 clasificó 79; la limpieza completa está pendiente.
-- **Sin integración continua.** Los 554 tests se corren a mano. Un repositorio como fuente de verdad sin verificación automática depende de la memoria de una persona.
+- **Sin integración continua.** Los 606 tests se corren a mano. Un repositorio como fuente de verdad sin verificación automática depende de la memoria de una persona.
 - La disciplina cuesta tiempo, y el tiempo es lo escaso en un proyecto de una sola persona.
 
 ### Operativas

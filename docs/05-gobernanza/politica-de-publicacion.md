@@ -26,7 +26,7 @@ La aplicación de esta regla a este proyecto quedó como [ADR-009: publicar el m
 - **Referencias públicas verificadas, con atribución.** Lo de otros se cita, no se absorbe.
 - **Esquemas SQL con nombres de tablas y columnas.** El nombre de una tabla no es un secreto; su contenido sí.
 - **Contratos, estados de máquina, decisiones y cronología.** Es el método, y es lo que vale.
-- **Métricas agregadas.** "554 tests", "217 workflows", "343 de 362 ejecuciones exitosas".
+- **Métricas agregadas.** "606 tests", "217 workflows", "343 de 362 ejecuciones exitosas".
 
 ---
 

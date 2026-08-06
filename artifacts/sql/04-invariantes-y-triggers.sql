@@ -3,20 +3,24 @@
 --
 --  RECONSTRUCCIÓN DIDÁCTICA SINTÉTICA. NO ES UN DUMP DE PRODUCCIÓN.
 --
---  Los guards de PraxIA Finanzas escritos como código ejecutable. Los nombres
---  y las invariantes son fieles al diseño verificado (v4.5, v4.7 y v4.8); la
---  implementación fue escrita de nuevo para este repositorio.
+--  Las invariantes del NÚCLEO FINANCIERO escritas como código ejecutable:
+--  borrado lógico, pagos de deuda, recálculo de saldos y respaldo único de un
+--  movimiento. Los nombres y las invariantes son fieles al diseño verificado
+--  (v4.3 y v4.5); la implementación fue escrita de nuevo para este repositorio.
 --
 --  La idea central: las reglas de negocio que no pueden violarse NUNCA viven
 --  en la base, no en el prompt del agente ni en el cliente. Un prompt se
 --  rodea con una reformulación; un trigger, no.
 --
---  Este archivo crea también las tablas mínimas de deudas y propuestas
---  (v4.3/v4.5/v4.8) porque sin ellas los guards no se pueden ejecutar.
+--  Este archivo crea también las tablas mínimas de deuda (v4.3/v4.5) porque
+--  sin ellas los guards no se pueden ejecutar.
+--
+--  Las invariantes FISCALES viven en otros dos archivos, cada una con un solo
+--  dueño: el 08 para el cierre y el estado derivado, el 09 para las propuestas.
 --
 --  Motor:   PostgreSQL 16
 --  Requiere: 03-esquema-finanzas-nucleo.sql
---  Corte:   2026-08-05
+--  Corte:   2026-08-06
 -- =============================================================================
 
 \set ON_ERROR_STOP on
@@ -43,7 +47,7 @@ CREATE TRIGGER trg_movimientos_updated_at
     FOR EACH ROW EXECUTE FUNCTION praxia_finanzas.tocar_updated_at();
 
 -- -----------------------------------------------------------------------------
--- 1. Tablas de deuda y propuestas (mínimas, para que los guards corran)
+-- 1. Tablas de deuda (mínimas, para que los guards corran)
 -- -----------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS praxia_finanzas.deudas_pendientes (
@@ -85,38 +89,6 @@ COMMENT ON TABLE praxia_finanzas.deuda_pagos IS
     'Pagos totales y parciales de una deuda, sin duplicar movimientos. Anular '
     'un pago es baja lógica y devuelve el saldo automáticamente.';
 
-CREATE TABLE IF NOT EXISTS praxia_finanzas.fiscal_propuestas (
-    id               bigint      GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    movimiento_id    bigint      NOT NULL REFERENCES praxia_finanzas.movimientos(id),
-    contenido        jsonb       NOT NULL,
-    motivo           text        NOT NULL,
-    -- Identidad del contenido propuesto: sirve para no volver a proponer lo mismo.
-    huella           text        NOT NULL,
-    -- Identidad de la evidencia sobre la que se propuso: si la evidencia
-    -- cambió, la propuesta caducó y no puede aprobarse.
-    huella_evidencia text        NOT NULL,
-    estado           text        NOT NULL DEFAULT 'pendiente'
-                                 CHECK (estado IN ('pendiente','aprobada','rechazada','caducada')),
-    decidida_at      timestamptz,
-    decidida_por     text,
-    created_at       timestamptz NOT NULL DEFAULT now(),
-
-    CONSTRAINT propuesta_decidida_con_fecha
-        CHECK (estado IN ('pendiente','caducada') OR decidida_at IS NOT NULL)
-);
-
-COMMENT ON TABLE praxia_finanzas.fiscal_propuestas IS
-    'Propuestas de clasificación fiscal que el motor eleva a decisión humana. '
-    'El agente propone a partir de precedentes; la persona decide. La '
-    'aprobación no ejecuta nada financieramente.';
-
--- No insistir con lo mismo: una sola propuesta pendiente por (movimiento, huella).
--- Es la traducción estructural de "un agente que puede repreguntar sin límite
--- termina consiguiendo el sí por cansancio".
-CREATE UNIQUE INDEX IF NOT EXISTS propuesta_pendiente_uniq
-    ON praxia_finanzas.fiscal_propuestas (movimiento_id, huella)
-    WHERE estado = 'pendiente';
-
 DROP TRIGGER IF EXISTS trg_deudas_updated_at ON praxia_finanzas.deudas_pendientes;
 CREATE TRIGGER trg_deudas_updated_at
     BEFORE UPDATE ON praxia_finanzas.deudas_pendientes
@@ -132,6 +104,9 @@ CREATE TRIGGER trg_deudas_updated_at
 -- Esta es la tercera de tres capas: no existe endpoint DELETE, el rol de la
 -- aplicación no tiene el permiso, y además el trigger lo bloquea. Las tres
 -- porque cada una falla de una manera distinta.
+--
+-- La función es genérica a propósito: los archivos 07 y 09 la reutilizan para
+-- las tablas fiscales que también son evidencia.
 -- =============================================================================
 
 CREATE OR REPLACE FUNCTION praxia_finanzas.prohibir_delete_fisico()
@@ -158,7 +133,7 @@ BEGIN
     FOREACH t IN ARRAY ARRAY[
         'movimientos', 'movimientos_auditoria', 'ingesta_raw',
         'transferencias', 'deudas_pendientes', 'deuda_pagos',
-        'fiscal_propuestas', 'fx_rates'
+        'fx_rates'
     ]
     LOOP
         EXECUTE format(
@@ -171,53 +146,7 @@ END;
 $$;
 
 -- =============================================================================
--- GUARD 2 · movimiento_estado_fiscal_derivado   (migración v4.7)
--- -----------------------------------------------------------------------------
--- INVARIANTE: estado_fiscal NO PUEDE DIVERGIR de ambito + deducible.
---
--- Antes de v4.7 eran tres campos independientes y bastaba con corregir el
--- ámbito y olvidarse del estado fiscal para tener un movimiento que decía dos
--- cosas distintas. La solución no fue "acordarse": fue derivar. Si un valor se
--- puede calcular, no se guarda como decisión independiente.
---
--- Además rechaza la combinación imposible: nada personal es deducible.
--- =============================================================================
-
-CREATE OR REPLACE FUNCTION praxia_finanzas.movimiento_estado_fiscal_derivado()
-RETURNS trigger
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    IF NEW.ambito = 'personal' AND NEW.deducible THEN
-        RAISE EXCEPTION
-            'Combinación imposible: ambito personal con deducible = true (movimiento %).',
-            coalesce(NEW.id::text, 'nuevo')
-            USING HINT = 'Si el gasto es deducible, su ámbito es profesional.';
-    END IF;
-
-    NEW.estado_fiscal :=
-        CASE
-            WHEN NEW.ambito = 'personal' THEN 'no_fiscal'
-            WHEN NEW.deducible           THEN 'fiscal_deducible'
-            ELSE                              'fiscal_no_deducible'
-        END;
-
-    RETURN NEW;
-END;
-$$;
-
-COMMENT ON FUNCTION praxia_finanzas.movimiento_estado_fiscal_derivado() IS
-    'Invariante v4.7: estado_fiscal se deriva de ambito + deducible. No se '
-    'declara, se calcula. Elimina de raíz la desincronización entre los tres.';
-
-DROP TRIGGER IF EXISTS trg_mov_estado_fiscal ON praxia_finanzas.movimientos;
-CREATE TRIGGER trg_mov_estado_fiscal
-    BEFORE INSERT OR UPDATE OF ambito, deducible, estado_fiscal
-    ON praxia_finanzas.movimientos
-    FOR EACH ROW EXECUTE FUNCTION praxia_finanzas.movimiento_estado_fiscal_derivado();
-
--- =============================================================================
--- GUARD 3 · deuda_pago_validar   (migración v4.5)
+-- GUARD 2 · deuda_pago_validar   (migración v4.5)
 -- -----------------------------------------------------------------------------
 -- INVARIANTE: un pago se hace en la MISMA MONEDA que la deuda que cancela.
 --
@@ -305,7 +234,7 @@ CREATE TRIGGER trg_deuda_pago_validar
     FOR EACH ROW EXECUTE FUNCTION praxia_finanzas.deuda_pago_validar();
 
 -- =============================================================================
--- GUARD 4 · recalcular_saldo_deuda   (migración v4.5)
+-- GUARD 3 · recalcular_saldo_deuda   (migración v4.5)
 -- -----------------------------------------------------------------------------
 -- INVARIANTE: el saldo de una deuda es una CONSECUENCIA de sus pagos, nunca un
 -- valor escrito a mano.
@@ -360,12 +289,13 @@ CREATE TRIGGER trg_recalcular_saldo_deuda
     AFTER INSERT OR UPDATE ON praxia_finanzas.deuda_pagos
     FOR EACH ROW EXECUTE FUNCTION praxia_finanzas.recalcular_saldo_deuda();
 
--- -----------------------------------------------------------------------------
--- GUARD 4-bis · movimiento_respaldo_deuda_guard
+-- =============================================================================
+-- GUARD 4 · movimiento_respaldo_deuda_guard
 -- -----------------------------------------------------------------------------
 -- INVARIANTE: "un pago se contabiliza exactamente una vez". Un mismo
 -- movimiento no puede respaldar dos pagos vigentes. Se implementa como índice
 -- único parcial: más barato y más difícil de esquivar que un trigger.
+-- =============================================================================
 
 CREATE UNIQUE INDEX IF NOT EXISTS movimiento_respaldo_deuda_guard
     ON praxia_finanzas.deuda_pagos (movimiento_id)
@@ -374,139 +304,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS movimiento_respaldo_deuda_guard
 COMMENT ON INDEX praxia_finanzas.movimiento_respaldo_deuda_guard IS
     'Invariante: un movimiento respalda a lo sumo un pago vigente. Es lo que '
     'impide que la misma transferencia cancele dos deudas.';
-
--- =============================================================================
--- GUARD 5 · propuesta_nace_pendiente   (migración v4.8)
--- -----------------------------------------------------------------------------
--- INVARIANTE: ninguna propuesta del agente nace aprobada.
---
--- Sin este guard, el camino más corto para que un agente apruebe sus propias
--- propuestas es insertarlas ya aprobadas. No hace falta mala intención: basta
--- un cliente que rellene el campo por defecto.
--- =============================================================================
-
-CREATE OR REPLACE FUNCTION praxia_finanzas.propuesta_nace_pendiente()
-RETURNS trigger
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    IF NEW.estado IS DISTINCT FROM 'pendiente' THEN
-        RAISE EXCEPTION
-            'Una propuesta fiscal nace pendiente; se intentó crear con estado "%".',
-            NEW.estado
-            USING HINT = 'La decisión se registra después, por POST /api/fiscal-propuestas/decidir.';
-    END IF;
-
-    NEW.decidida_at  := NULL;
-    NEW.decidida_por := NULL;
-    RETURN NEW;
-END;
-$$;
-
-COMMENT ON FUNCTION praxia_finanzas.propuesta_nace_pendiente() IS
-    'Invariante v4.8: toda propuesta se crea en estado pendiente y sin datos '
-    'de decisión. El agente propone; no decide.';
-
-DROP TRIGGER IF EXISTS trg_propuesta_nace_pendiente ON praxia_finanzas.fiscal_propuestas;
-CREATE TRIGGER trg_propuesta_nace_pendiente
-    BEFORE INSERT ON praxia_finanzas.fiscal_propuestas
-    FOR EACH ROW EXECUTE FUNCTION praxia_finanzas.propuesta_nace_pendiente();
-
--- =============================================================================
--- GUARD 6 · propuesta_contenido_inmutable   (migración v4.8)
--- -----------------------------------------------------------------------------
--- INVARIANTE: lo que se aprueba es exactamente lo que se propuso.
---
--- Si el contenido pudiera editarse después de creado, la aprobación humana no
--- probaría nada: alguien aprueba A y lo que queda registrado es B. Cambiar la
--- propuesta obliga a crear una propuesta nueva, con su propia huella.
--- =============================================================================
-
-CREATE OR REPLACE FUNCTION praxia_finanzas.propuesta_contenido_inmutable()
-RETURNS trigger
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    IF NEW.movimiento_id    IS DISTINCT FROM OLD.movimiento_id
-    OR NEW.contenido        IS DISTINCT FROM OLD.contenido
-    OR NEW.motivo           IS DISTINCT FROM OLD.motivo
-    OR NEW.huella           IS DISTINCT FROM OLD.huella
-    OR NEW.huella_evidencia IS DISTINCT FROM OLD.huella_evidencia
-    OR NEW.created_at       IS DISTINCT FROM OLD.created_at
-    THEN
-        RAISE EXCEPTION
-            'El contenido de la propuesta % es inmutable. Sólo puede cambiar su estado.',
-            OLD.id
-            USING HINT = 'Crear una propuesta nueva en vez de editar esta.';
-    END IF;
-
-    RETURN NEW;
-END;
-$$;
-
-COMMENT ON FUNCTION praxia_finanzas.propuesta_contenido_inmutable() IS
-    'Invariante v4.8: una propuesta creada no se edita. Sólo su estado cambia. '
-    'Es lo que hace que la aprobación humana signifique algo.';
-
-DROP TRIGGER IF EXISTS trg_propuesta_inmutable ON praxia_finanzas.fiscal_propuestas;
-CREATE TRIGGER trg_propuesta_inmutable
-    BEFORE UPDATE ON praxia_finanzas.fiscal_propuestas
-    FOR EACH ROW EXECUTE FUNCTION praxia_finanzas.propuesta_contenido_inmutable();
-
--- =============================================================================
--- GUARD 7 · propuesta_transicion_valida   (migración v4.8)
--- -----------------------------------------------------------------------------
--- INVARIANTE: los estados siguen su máquina, sin atajos y sin vuelta atrás.
---
---   pendiente → aprobada | rechazada | caducada
---   aprobada  → (terminal)
---   rechazada → (terminal)
---   caducada  → (terminal)
---
--- Un estado terminal que se puede reabrir no es terminal. "Des-aprobar" una
--- propuesta borraría la evidencia de que alguien la aprobó.
--- =============================================================================
-
-CREATE OR REPLACE FUNCTION praxia_finanzas.propuesta_transicion_valida()
-RETURNS trigger
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    IF NEW.estado = OLD.estado THEN
-        RETURN NEW;
-    END IF;
-
-    IF OLD.estado <> 'pendiente' THEN
-        RAISE EXCEPTION
-            'Transición inválida: % -> %. Los estados decididos son terminales.',
-            OLD.estado, NEW.estado;
-    END IF;
-
-    IF NEW.estado NOT IN ('aprobada','rechazada','caducada') THEN
-        RAISE EXCEPTION 'Estado destino desconocido: %.', NEW.estado;
-    END IF;
-
-    -- Una decisión humana necesita fecha y firma. La caducidad, no: la produce
-    -- el sistema cuando cambia la evidencia.
-    IF NEW.estado IN ('aprobada','rechazada') THEN
-        IF NEW.decidida_por IS NULL OR btrim(NEW.decidida_por) = '' THEN
-            RAISE EXCEPTION 'Falta decidida_por: una decisión sin responsable no se registra.';
-        END IF;
-        NEW.decidida_at := coalesce(NEW.decidida_at, now());
-    END IF;
-
-    RETURN NEW;
-END;
-$$;
-
-COMMENT ON FUNCTION praxia_finanzas.propuesta_transicion_valida() IS
-    'Invariante v4.8: sólo se decide una propuesta pendiente, la decisión es '
-    'terminal y toda aprobación o rechazo lleva responsable y fecha.';
-
-DROP TRIGGER IF EXISTS trg_propuesta_transicion ON praxia_finanzas.fiscal_propuestas;
-CREATE TRIGGER trg_propuesta_transicion
-    BEFORE UPDATE OF estado ON praxia_finanzas.fiscal_propuestas
-    FOR EACH ROW EXECUTE FUNCTION praxia_finanzas.propuesta_transicion_valida();
 
 COMMIT;
 
@@ -523,9 +320,30 @@ COMMIT;
 --   INSERT INTO praxia_finanzas.deuda_pagos (deuda_id, monto, moneda)
 --   VALUES (1, 100.00, 'ARS');
 --
---   -- Debe fallar: personal y deducible a la vez
---   UPDATE praxia_finanzas.movimientos SET ambito='personal', deducible=true WHERE id=1;
+--   -- Debe fallar: el pago excede el saldo
+--   INSERT INTO praxia_finanzas.deuda_pagos (deuda_id, monto, moneda)
+--   VALUES (1, 5000.00, 'USD');
 --
 --   -- Debe fallar: borrado físico
 --   DELETE FROM praxia_finanzas.movimientos WHERE id = 1;
+-- =============================================================================
+
+-- =============================================================================
+-- Dónde están las invariantes FISCALES
+--
+-- Este archivo cubre el núcleo financiero y nada más. Cada invariante fiscal
+-- tiene un único dueño, y ninguno pisa lo que crea otro:
+--
+--   · 07-nucleo-fiscal.sql            — `fiscal_auditoria_inmutable()` (auditoría
+--                                        append-only), `completar_periodo_fiscal()`
+--                                        y `completar_periodo_comprobante()`.
+--   · 08-cierre-y-estado-derivado.sql — `movimiento_estado_fiscal_derivado()`
+--                                        y `cierre_transicion_valida()`.
+--   · 09-propuestas-fiscales.sql      — `propuesta_nace_pendiente()`,
+--                                        `propuesta_contenido_inmutable()` y
+--                                        `propuesta_transicion_valida()`.
+--
+-- La regla que se sigue en toda la serie: una tabla, una invariante y un
+-- archivo que la crea. Un archivo que tenga que destruir lo que hizo otro para
+-- hacer su trabajo es una señal de que el reparto está mal hecho.
 -- =============================================================================

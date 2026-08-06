@@ -31,7 +31,7 @@ Esta tabla es el atajo. Si sólo vas a leer una cosa de esta sección, que sea e
 | Revisar, corregir y confirmar muchos registros seguidos | **Dashboard web** | El chat es pésimo para trabajo tabular y para ver 40 pendientes de un vistazo | SPA vanilla de un archivo, 7 secciones ([06](06-cuando-uso-frontend.md)) |
 | Que el agente recuerde hechos entre conversaciones | **Tabla `memory_facts` + gate determinístico** | Barato, inspeccionable, corregible a mano. Sin embeddings | `Code - Memory Intent Gate` + `PraxIA Memory Preflight` ([07](07-memoria-y-rag.md)) |
 | Publicar servicios con TLS sin exponer la base | **Docker + Traefik, sin puertos publicados** | La superficie de ataque que no existe no se audita | PostgreSQL sólo en loopback, `127.0.0.1:5433` ([08](08-infra-y-despliegue.md)) |
-| Verificar lógica que vive en SQL | **`node --test` + PGlite con el esquema real** | Mockear la base es testear el mock. PGlite corre el DDL de verdad | 554 casos en 27 archivos ([09](09-testing-y-evidencia.md)) |
+| Verificar lógica que vive en SQL | **`node --test` + PGlite con el esquema real** | Mockear la base es testear el mock. PGlite corre el DDL de verdad | 606 casos en verde ([09](09-testing-y-evidencia.md)) |
 
 ## Índice
 
@@ -67,10 +67,10 @@ Todos los casos que se citan en esta sección salen del mismo sistema, con corte
 | Workflows n8n registrados / activos / de laboratorio | 217 / 25 / 125 | [02](02-cuando-uso-n8n.md), [08](08-infra-y-despliegue.md) |
 | Nodos del orquestador (27/07 → 03/08) | 47 → 51 | [02](02-cuando-uso-n8n.md), [03](03-cuando-construyo-un-subagente.md) |
 | Ejecuciones en 7 días | 377 (343 OK / 19 fallidas) | [02](02-cuando-uso-n8n.md) |
-| Versión del esquema fiscal | v4.8, 33+ migraciones, 35 tablas | [01](01-cuando-uso-sql.md), [08](08-infra-y-despliegue.md) |
+| Versión del esquema fiscal | v4.13, 40+ migraciones, 39 tablas | [01](01-cuando-uso-sql.md), [08](08-infra-y-despliegue.md) |
 | Endpoints HTTP | 60+, ninguno `DELETE` | [05](05-cuando-uso-una-api-propia.md) |
 | Herramientas MCP | 22 en 4 scopes | [04](04-cuando-uso-un-mcp.md) |
-| Casos de test | 554 en 27 archivos | [09](09-testing-y-evidencia.md) |
+| Casos de test | 606 en verde, 0 salteados | [09](09-testing-y-evidencia.md) |
 | Hechos en la memoria estructurada | 26 | [07](07-memoria-y-rag.md) |
 | Líneas del dashboard | 1.911, en un archivo | [06](06-cuando-uso-frontend.md) |
 

@@ -88,7 +88,7 @@ Si un término te aparece en otro documento y no está acá, es un hueco: anotal
 
 **Harness** — El andamiaje que permite correr pruebas de forma repetible, con una base o un entorno simulados.
 
-*Ejemplo:* los 554 tests de Finanzas corren con un harness basado en **PGlite**, que replica el esquema real de PostgreSQL sin necesidad de levantar el servidor.
+*Ejemplo:* los 606 tests de Finanzas corren con un harness basado en **PGlite**, que replica el esquema real de PostgreSQL sin necesidad de levantar el servidor.
 
 **Huella** — Un identificador derivado del contenido, que cambia si el contenido cambia. Sirve para detectar repeticiones y detectar modificaciones.
 
@@ -122,7 +122,7 @@ Si un término te aparece en otro documento y no está acá, es un hueco: anotal
 
 **Migración** — Un cambio versionado de la estructura de la base. Se aplica en orden, queda registrado y se puede auditar.
 
-*Ejemplo:* el esquema de Finanzas va por la v4.8. Se aplican con `ON_ERROR_STOP=1` dentro de una transacción: si algo falla, no queda a medio camino.
+*Ejemplo:* el esquema de Finanzas va por la v4.13. Se aplican con `ON_ERROR_STOP=1` dentro de una transacción: si algo falla, no queda a medio camino.
 
 ## N
 

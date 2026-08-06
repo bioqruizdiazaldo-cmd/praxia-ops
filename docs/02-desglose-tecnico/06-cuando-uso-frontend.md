@@ -72,7 +72,7 @@ Lo que se pierde, sin adornos:
 - **No hay componentes reutilizables de verdad.** Hay funciones que devuelven strings de HTML. Con 7 secciones es manejable; con 20 sería un problema serio.
 - **El estado se maneja a mano.** Sincronizar UI y datos es responsabilidad del código, y ahí es donde aparecen los bugs de "la tabla no se actualizó".
 - **1.911 líneas en un archivo son 1.911 líneas en un archivo.** La navegación es por búsqueda de texto.
-- **No hay tests de UI.** Los 554 casos cubren backend y lógica; hay tests de **exportación del dashboard**, que verifican el dato que sale, no la interacción.
+- **No hay tests de UI.** Los 606 casos cubren backend y lógica; hay tests de **exportación del dashboard**, que verifican el dato que sale, no la interacción.
 - **Accesibilidad y estados de carga hay que escribirlos a mano**, uno por uno.
 
 El balance depende enteramente de la escala. Para 7 secciones sobre una API bien definida, con un solo usuario, la elección es correcta y ahorra semanas. Para una app multiusuario con permisos por pantalla, sería la elección equivocada y habría que migrar.

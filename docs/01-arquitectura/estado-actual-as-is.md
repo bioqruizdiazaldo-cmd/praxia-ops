@@ -12,7 +12,7 @@ Este documento existe porque la alternativa —describir el sistema como uno que
 
 | Dimensión | Estado |
 |---|---|
-| **Funcionalidad** | Alta. Agente multimodal 24/7, memoria persistente, finanzas con núcleo fiscal, 554 tests |
+| **Funcionalidad** | Alta. Agente multimodal 24/7, memoria persistente, finanzas con núcleo fiscal, agente fiscal de solo lectura, 606 tests |
 | **Fiabilidad operativa** | Buena. 343/362 ejecuciones exitosas en la ventana de 7 días; errores capturados y notificados |
 | **Disciplina de ingeniería** | Buena en lo nuevo, débil en lo heredado. Migraciones versionadas y testeadas; workflows sin ambientes ni releases trazables |
 | **Higiene del runtime** | **Mala.** Producción se usó como laboratorio y archivo histórico |
@@ -31,8 +31,8 @@ Este documento existe porque la alternativa —describir el sistema como uno que
 | Nodos del orquestador | 51 (eran 47 el 2026-07-27, 37 el 2026-07-23) | Corte 2026-08-03 |
 | Ejecuciones conservadas | 377 | Corte 2026-08-03 |
 | Ejecuciones últimos 7 días | 343 exitosas / 19 fallidas | Corte 2026-08-03 |
-| Tablas en producción tras la puesta al día | 35 (eran 25) | Migración v4.6, 2026-08-05 |
-| Casos de test automatizados | 554 en 27 archivos | `node --test` + PGlite |
+| Tablas en producción | 39 (eran 25 antes de la puesta al día del 05/08, y 35 tras ella) | Serie v4.9 → v4.13, 2026-08-06 |
+| Casos de test automatizados | 606 en verde, 0 salteados | `node --test` + PGlite |
 | Último export de memoria verificado | 2026-08-05 02:30 UTC — 2 proyectos, 26 hechos, 4 tareas, 1 deduplicada, **0 secretos omitidos** | PraxIA Sync |
 
 ---
@@ -63,8 +63,8 @@ Esto no es aspiracional: corre y hay evidencia.
 - Un solo camino de alta (`POST /api/ingesta`) para seis orígenes distintos.
 - Invariantes en la base, no en el prompt: `prohibir_delete_fisico`, `deuda_pago_validar`, `movimiento_respaldo_deuda_guard`, `propuesta_contenido_inmutable`, `propuesta_transicion_valida`.
 - Rol de base `praxia_finanzas_rw` **sin permiso DELETE**. Ningún endpoint `DELETE` en toda la API.
-- Esquema en v4.8, con `schema_migrations` y despliegue en transacción con `ON_ERROR_STOP=1`.
-- 554 casos de test contra el esquema real vía PGlite.
+- Esquema en v4.13, con `schema_migrations` y despliegue en transacción con `ON_ERROR_STOP=1`.
+- 606 casos de test contra el esquema real vía PGlite.
 - Servidor MCP con OAuth/JWT/PKCE y cuatro scopes separados.
 
 ### Errores
@@ -109,7 +109,7 @@ Ver [post-mortem del drift](../06-runbooks/postmortem-drift-produccion.md).
 
 ### 4. Backups sin off-site ni restore drill
 
-Hay backups diarios, semanales y mensuales en `/opt/praxia/backups/`, con lock para evitar solapamiento, `manifest.json` y un `restore_check.sh`.
+Hay backups diarios, semanales y mensuales en `<ruta-de-despliegue>/backups/`, con lock para evitar solapamiento, `manifest.json` y un `restore_check.sh`.
 
 Lo que **no** hay: copia fuera del mismo servidor, y un ensayo de restauración completo ejecutado y documentado.
 

@@ -1,6 +1,6 @@
 # Decisiones (ADR)
 
-Las nueve decisiones que explican por qué este sistema es como es — incluida la de no publicar un componente terminado.
+Las trece decisiones que explican por qué este sistema es como es — incluida la de no publicar un componente terminado.
 
 ## Qué es un ADR y por qué están acá
 
@@ -27,6 +27,10 @@ Están en español, son cortos y ninguno afirma más de lo que se puede demostra
 | [ADR-007](adr-007-sin-borrado-fisico.md) | Sin borrado físico | 2026-07-27 | Vigente |
 | [ADR-008](adr-008-el-repositorio-como-fuente-de-verdad.md) | El repositorio como fuente de verdad | 2026-08-03 | Aceptada |
 | [ADR-009](adr-009-publicar-el-metodo-no-el-sistema.md) | Publicar el método, no el sistema | 2026-08-05 | Vigente |
+| [ADR-010](adr-010-el-agente-propone-el-humano-decide.md) | El agente propone, el humano decide | 2026-08-05 | Vigente |
+| [ADR-011](adr-011-precedentes-verificables-en-vez-de-inferencia.md) | Precedentes verificables en vez de inferencia | 2026-08-05 | Vigente |
+| [ADR-012](adr-012-la-invariante-vive-en-la-base.md) | La invariante vive en la base | 2026-08-05 | Vigente |
+| [ADR-013](adr-013-abstenerse-antes-que-devolver-un-resultado-parcial.md) | Abstenerse antes que devolver un resultado parcial | 2026-08-04 | Vigente |
 
 ## Vocabulario de estados
 
@@ -39,7 +43,18 @@ Están en español, son cortos y ninguno afirma más de lo que se puede demostra
 
 ## Si sólo vas a leer una
 
-Leé el [ADR-006](adr-006-buscador-general-no-publicado.md). Es la decisión de no publicar un componente que ya estaba construido, porque pasó 2 de 7 pruebas contra una exigencia declarada de 7/7. Es la única de las nueve que no produjo ningún entregable, y es la que mejor describe cómo se trabaja acá.
+Leé el [ADR-006](adr-006-buscador-general-no-publicado.md). Es la decisión de no publicar un componente que ya estaba construido, porque pasó 2 de 7 pruebas contra una exigencia declarada de 7/7. Es la única de las trece que no produjo ningún entregable, y es la que mejor describe cómo se trabaja acá.
+
+## El bloque fiscal: ADR-010 a ADR-013
+
+Las cuatro últimas salieron del mismo subsistema —el [Agente Fiscal](../../systems/praxia-agente-fiscal/README.md)— y se leen mejor juntas, porque responden a cuatro versiones de la misma pregunta: **cómo se le pone freno a un agente que opera sobre algo que importa.**
+
+| ADR | La pregunta que responde |
+|---|---|
+| [ADR-010](adr-010-el-agente-propone-el-humano-decide.md) | ¿Qué puede escribir el agente? Una tabla que no mueve un peso, y no tiene la credencial para aprobarla |
+| [ADR-011](adr-011-precedentes-verificables-en-vez-de-inferencia.md) | ¿En qué se apoya lo que afirma? En decisiones anteriores del titular, no en inferencia |
+| [ADR-012](adr-012-la-invariante-vive-en-la-base.md) | ¿Dónde se garantiza lo que tiene que ser siempre cierto? En la base, porque el código ya falló una vez |
+| [ADR-013](adr-013-abstenerse-antes-que-devolver-un-resultado-parcial.md) | ¿Qué hace cuando no puede responder del todo? Se abstiene, con un código, en vez de entregar la mitad |
 
 ## Relación con el resto del repositorio
 

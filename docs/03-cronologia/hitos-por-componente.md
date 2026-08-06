@@ -6,11 +6,12 @@ Sirve para responder una pregunta distinta. La línea de tiempo contesta *"¿qu�
 
 ## Mapa rápido
 
-| Componente | Nace | Estado al 2026-08-05 | Versión o fase |
+| Componente | Nace | Estado al 2026-08-06 | Versión o fase |
 |---|---|---|---|
 | [Oppenheimer](#oppenheimer--orquestador-y-subagentes) | 14/07 23:05 | Producción | Orquestador con 51 nodos |
 | [PraxIA Memory Core](#praxia-memory-core--memoria-persistente) | 18/07 | Producción | 4 capas, sin RAG vectorial |
-| [PraxIA Finanzas](#praxia-finanzas--esquema-financiero-y-fiscal) | 26/07 | Producción | Esquema DB v4.8 · API 3.6.0 · MCP 1.0.0 |
+| [PraxIA Finanzas](#praxia-finanzas--esquema-financiero-y-fiscal) | 26/07 | Producción | Esquema DB v4.13 · API 3.6.0 · MCP 1.0.0 |
+| [Agente Fiscal](#agente-fiscal--el-que-propone-y-nunca-aplica) | 04/08 | Producción | Contrato v1.0 · motor v4.8 · esquema v4.13 |
 | [Buscador web](#buscador-web--el-que-sí-y-el-que-no) | 25/07 23:18 | Tavily V1 en producción · General **no publicado** | V1 activo · General rechazado |
 | [Gobernanza](#gobernanza--método-evidencia-y-publicación) | 13/07 | Línea base cerrada | 18 documentos (03/08) |
 | [Contenido](#contenido--ai-command-center-y-arquitecto-ia-redes) | 20/07 | **Fase 0, nada desplegado** | Cero commits |
@@ -71,7 +72,7 @@ Cuatro capas y ningún embedding. La decisión de no usar RAG vectorial está do
 
 ## PraxIA Finanzas — esquema financiero y fiscal
 
-El componente más grande y el de evolución más rápida: de una decisión de diseño el 26 de julio a un esquema en v4.8, con API, dashboard, servidor MCP y 554 tests, en diez días. Nació con una restricción que definió todo: no ser un sistema nuevo.
+El componente más grande y el de evolución más rápida: de una decisión de diseño el 26 de julio a un esquema en v4.8, con API, dashboard, servidor MCP y 606 tests, en diez días — y a v4.13 con 39 tablas al día siguiente. Nació con una restricción que definió todo: no ser un sistema nuevo.
 
 ### Base y contrato
 
@@ -96,7 +97,12 @@ El componente más grande y el de evolución más rápida: de una decisión de d
 | v4.6 | 2026-08-02/03 | Obligaciones recurrentes: `plantillas_recurrentes`, `plantilla_precios`, `planes_pago`, `plan_pago_origenes`, `plan_pago_documentos`, `obligacion_documentos`, `obligacion_cargos`, `generacion_ejecuciones`. Identidad de ocurrencia `(plantilla_id, occurrence_key)` |
 | Contrato v1.0 | 2026-08-04 | Contrato Finanzas↔Fiscal aprobado. Capa de lectura fiscal con 9 operaciones solo-GET. Adenda del ADR para el tratamiento USD/ARS |
 | v4.7 | 2026-08-05 | `movimiento_estado_fiscal_derivado` y `cierre_transicion_valida`: `estado_fiscal` ya no puede divergir de `ambito` + `deducible` |
-| v4.8 | 2026-08-05 | `fiscal_propuestas` con triggers `propuesta_nace_pendiente`, `propuesta_contenido_inmutable` y `propuesta_transicion_valida`. Campos `huella` y `huella_evidencia`. `fiscal_motor.mjs`: propuestas por precedente del dueño |
+| v4.8 | 2026-08-05 | `fiscal_propuestas` con triggers `propuesta_nace_pendiente`, `propuesta_contenido_inmutable` y `propuesta_transicion_valida`. Campos `huella` y `huella_evidencia`. `fiscal_motor.mjs`: propuestas por precedente del dueño. Dos detectores nuevos (11 → 13) |
+| v4.9 | 2026-08-05/06 | Contribuyentes con FK obligatoria: `regimen_vigente()`, `perfil_fiscal_sin_solapamiento()`, `imputacion_mismo_contribuyente()`. Aislamiento entre contribuyentes garantizado en la base |
+| v4.10 | 2026-08-05/06 | Plantillas recurrentes completas, con máquina de estados propia: reactivar una plantilla exige `vigente_desde` |
+| v4.11 | 2026-08-05/06 | `catalogo_obligaciones`, `dias_no_habiles`, `terminacion_cuit`, `vencimiento_habil()` y `vencimiento_de_obligacion()` |
+| v4.12 | 2026-08-05/06 | Feriados 2026 cargados |
+| v4.13 | 2026-08-05/06 | Un régimen `historico` sigue siendo válido: `regimen_vigente()` deja de exigir `estado='vigente'` y sólo descarta `baja` y `observado` |
 
 ### Superficie e infraestructura del componente
 
@@ -105,8 +111,29 @@ El componente más grande y el de evolución más rápida: de una decisión de d
 | Servidor MCP | 2026-08-02/03 | Recuperado y versionado. 22 herramientas en 4 scopes OAuth: `praxia.read` (8), `praxia.fiscal.read` (10), `praxia.write` (1), `praxia.modify` (4) |
 | Dashboard | 2026-08-02/03 | SPA vanilla de un archivo con 7 secciones. Prototipo UI v3 **aprobado en diseño, no migrado** |
 | Puesta al día de producción | 2026-08-05 | v4.4 → v4.6 aplicadas. Verificación de no-regresión: 25 → 35 tablas, valores idénticos |
+| Serie final desplegada | 2026-08-05/06 | v4.9 → v4.13 aplicadas. Producción en **v4.13**, **39 tablas**. Hubo un incidente de despliegue por un Dockerfile con la lista de archivos escrita a mano, resuelto con rollback |
 
 **Invariantes que no cambiaron nunca:** único camino de alta (`POST /api/ingesta`), cero endpoints `DELETE`, rol de base de datos sin permiso `DELETE`, baja lógica con auditoría.
+
+---
+
+## Agente Fiscal — el que propone y nunca aplica
+
+Nace como contrato antes que como código, y ése es el dato que lo distingue del resto de los componentes: el 4 de agosto se aprueba un documento de 21 secciones que declara qué puede leer, qué no puede tocar y qué tiene que hacer cuando no sabe. La implementación llega después y se limita a lo que el contrato ya permitía. Ficha completa en [`systems/praxia-agente-fiscal`](../../systems/praxia-agente-fiscal/).
+
+| Fase | Fecha | Qué cambió |
+|---|---|---|
+| Contrato v1.0 aprobado | 2026-08-04 | 21 secciones + Anexo A. *"Contrato lógico y técnico de solo lectura"*, con principios no negociables, envelope de respuesta, 9 códigos de abstención y matriz de permisos. Ver [contrato-finanzas-fiscal.md](../../systems/praxia-agente-fiscal/contrato-finanzas-fiscal.md) |
+| Capa de lectura | 2026-08-04 | Nueve operaciones solo-GET con guardia que rechaza todo lo que no empiece con `SELECT` o `WITH`, paginación por cursor y auditoría de consulta al log. Tercer token de API y 9 herramientas MCP bajo `praxia.fiscal.read`. **472 tests** |
+| Anexo A | 2026-08-04 | Verificación del contrato contra el esquema real levantando PGlite con el DDL y 11 migraciones: 55 objetos. Registra dónde el cuerpo del contrato describía estados y columnas que la base no confirma |
+| Incidente y v4.7 | 2026-08-05 | 22 movimientos clasificados y sin clasificar a la vez. `estado_fiscal` pasa a derivarse en la base y la máquina de estados del cierre deja de ser una función que nunca se ejecutaba. **492 tests**. Ver [post-mortem](../06-runbooks/postmortem-estado-fiscal-divergente.md) |
+| v4.8 — propuestas y motor | 2026-08-05 | `fiscal_propuestas` con sus tres triggers y sus dos huellas, `fiscal_motor.mjs` con `diagnosticarPeriodo()`, y dos detectores nuevos (11 → 13). **606 tests verdes, 0 salteados** |
+| Serie v4.9 → v4.13 | 2026-08-05/06 | Contribuyentes, plantillas recurrentes, catálogo de obligaciones con días no hábiles, feriados y régimen histórico válido. Producción en v4.13 |
+| Publicación | 2026-08-06 | Ficha de subsistema en 8 documentos, ADR-010 a ADR-013, capítulo 09 del manual, runbook de cierre mensual y post-mortem |
+
+**Umbrales del motor, tal como están en el código:** descripción mínima de 5 caracteres · sin precedente, abstención · precedentes contradictorios, abstención (no gana la mayoría) · confianza 0,60 / 0,75 / 0,85 según cuántos precedentes haya, **nunca 1** · el precedente no caduca por antigüedad, se informa la fecha de la última vez.
+
+**Deuda abierta del componente:** el disparo mensual automático en n8n sigue siendo un esqueleto de cuatro nodos con trigger manual y el período hardcodeado; el rol de PostgreSQL de solo lectura —la segunda barrera— es tarea de despliegue pendiente; la auditoría de consultas no se persiste; y `cierre_chequeos()` arrastra a propósito el filtro que corrigió la v4.13. Inventario completo en [límites y deudas](../../systems/praxia-agente-fiscal/limites-y-deudas.md).
 
 ---
 
@@ -184,4 +211,4 @@ Tres patrones sólo se ven cuando se separan los componentes:
 2. **Las correcciones se concentran.** El buscador Tavily recibió cuatro correcciones en 48 horas después de publicarse. Publicar temprano funciona si cada corrección viene con su lote de casos.
 3. **La gobernanza llegó última y explica lo anterior.** La línea base es del 3 de agosto, es decir, veinte días después del primer workflow. Se documentó un sistema que ya existía, y por eso el AS-IS registra deudas en vez de negarlas.
 
-> Última verificación: 2026-08-05
+> Última verificación: 2026-08-06

@@ -159,9 +159,9 @@ Tres mil líneas implementadas sin ningún punto de retorno. El commit inicial s
 
 **Compuerta G5:** la [definición de terminado](checklists/definicion-de-terminado.md).
 
-**Ejemplo real — 554 casos con PGlite**
+**Ejemplo real — 606 casos con PGlite**
 
-27 archivos de test que corren contra el esquema real, no contra un mock. Cubren montos ambiguos, separadores decimales, fechas, tipo de cambio, sanitización, datos sensibles, transferencias, migraciones y lectura fiscal. Cuando la migración v4.7 cambió `estado_fiscal` a derivado, los tests dijeron dónde se rompía.
+Una suite que corre contra el esquema real, no contra un mock. Cubren montos ambiguos, separadores decimales, fechas, tipo de cambio, sanitización, datos sensibles, transferencias, migraciones y lectura fiscal. Cuando la migración v4.7 cambió `estado_fiscal` a derivado, los tests dijeron dónde se rompía.
 
 **El mejor ejemplo — la revalidación del Buscador General (2026-07-27)**
 

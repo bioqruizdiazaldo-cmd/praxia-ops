@@ -12,16 +12,16 @@ It was built with **AI-assisted no-code/low-code engineering** — n8n as the or
 
 This repository is the sanitised, verifiable documentation of that work. The runtime, credentials and real data stay private.
 
-## System at a glance (2026-08-05)
+## System at a glance (2026-08-06)
 
 | Metric | Value |
 |---|---|
 | Agents in production | 1 orchestrator + 15 subagents/workflows |
 | n8n workflows registered / active | 217 / 25 |
 | Executions retained (7-day window) | 377 — 343 succeeded, 19 failed |
-| Versioned SQL migrations | 33+ (fiscal schema at v4.8) |
-| Tables in production | 35 |
-| Automated test cases | 554 (`node --test` + PGlite) |
+| Versioned SQL migrations | 40+ (fiscal schema at v4.13) |
+| Tables in production | 39 |
+| Automated test cases | 606 passing, 0 skipped (`node --test` + PGlite) |
 | HTTP endpoints on the finance API | 60+, zero `DELETE` |
 | MCP tools exposed | 22, across 4 OAuth scopes |
 | Days from first workflow to current system | 22 |
@@ -35,6 +35,7 @@ This repository is the sanitised, verifiable documentation of that work. The run
 - [Decisions](docs/04-decisiones/) — architecture decision records
 - [Governance](docs/05-gobernanza/) — the AI-assisted delivery lifecycle, templates and checklists
 - [Runbooks](docs/06-runbooks/) — operations, incidents, post-mortems
+- [Fiscal agent](systems/praxia-agente-fiscal/) — a read-only contract, precedent-based proposals and a hard 403: the agent proposes, it never applies, and the separation is a credential it does not hold
 
 Documentation is written in Spanish (Argentina); the governance guides in `docs/05-gobernanza` are available in English.
 

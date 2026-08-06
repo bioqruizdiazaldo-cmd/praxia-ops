@@ -57,7 +57,8 @@ flowchart TB
     subgraph FIN["Finanzas — PraxIA Finanzas"]
         API["API Node.js sin framework<br/>POST /api/ingesta<br/>unico camino de alta"]
         MCPS["Servidor MCP<br/>22 herramientas · 4 scopes"]
-        PGF[("PostgreSQL 16<br/>esquema praxia_finanzas<br/>v4.8 · 35 tablas")]
+        PGF[("PostgreSQL 16<br/>esquema praxia_finanzas<br/>v4.13 · 39 tablas")]
+        AGF["Agente Fiscal<br/>capa de solo lectura<br/>9 operaciones · 13 detectores"]
     end
 
     subgraph AUD["6 · Auditoria"]
@@ -108,6 +109,7 @@ flowchart TB
     SFIN --> API
     MCPS --> API
     API --> PGF
+    AGF --> API
 
     ORQC -.error.-> ERR --> AERR
     SMAIL -.error.-> ERR
@@ -232,7 +234,7 @@ En finanzas la misma idea toma otra forma: las cuatro herramientas MCP del scope
 
 > *"La aprobación no ejecuta nada financieramente."*
 
-Aprobar una propuesta fiscal no mueve plata. El impacto financiero sólo ocurre al registrar o vincular un pago real. Ver [modelo de permisos](modelo-de-permisos.md) y [ADR-004](../04-decisiones/adr-004-aprobacion-humana-en-acciones-consecuentes.md).
+Aprobar una propuesta fiscal no mueve plata. El impacto financiero sólo ocurre al registrar o vincular un pago real. Y el agente que las propone no puede aprobarlas: su token recibe **403** en la ruta de decisión. Ver [modelo de permisos](modelo-de-permisos.md), [ADR-004](../04-decisiones/adr-004-aprobacion-humana-en-acciones-consecuentes.md) y la ficha del [Agente Fiscal](../../systems/praxia-agente-fiscal/).
 
 ---
 
@@ -251,6 +253,7 @@ Un diagrama de arquitectura siempre es más prolijo que el sistema. Para leer el
 | Dónde vive cada dato | [Modelo de datos](modelo-de-datos.md) |
 | Ficha completa del agente | [`systems/oppenheimer`](../../systems/oppenheimer/) |
 | Ficha completa de finanzas | [`systems/praxia-finanzas`](../../systems/praxia-finanzas/) |
+| Ficha completa del agente fiscal | [`systems/praxia-agente-fiscal`](../../systems/praxia-agente-fiscal/) |
 | Estructura del orquestador nodo por nodo | [`artifacts/workflows-n8n/estructura-orquestador.md`](../../artifacts/workflows-n8n/estructura-orquestador.md) |
 
-> Última verificación: 2026-08-05
+> Última verificación: 2026-08-06

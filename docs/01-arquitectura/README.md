@@ -32,7 +32,7 @@ La arquitectura en siete capas se decidió el **2026-07-14**, el mismo día que 
 | 3 | **Modelo** | Interpretar lenguaje natural, redactar, resumir, clasificar, transcribir y hablar | OpenAI: chat, Whisper (voz→texto), TTS (texto→voz, "Jarvis"). Capa de abstracción para poder cambiar de proveedor (**D-1**) |
 | 4 | **Herramientas** | Ejecutar la acción real contra un sistema externo, con contrato de entrada y salida | Gmail · Google Calendar · Google Drive · Google Sheets · Tavily · Open-Meteo · Europe PMC + OpenAlex · API de PraxIA Finanzas · 22 herramientas MCP en 4 scopes |
 | 5 | **Memoria** | Recordar lo que importa entre conversaciones, y sólo eso | PostgreSQL 16 (`praxia` para memoria, `praxia_finanzas` para finanzas) · `Memory Buffer` de n8n · espejo Markdown en Obsidian · gate determinístico antes del modelo |
-| 6 | **Auditoría** | Dejar rastro de qué se hizo, cuándo, con qué herramienta y bajo qué permiso — y avisar cuando algo falla | `praxia.agent_errors` + `errorWorkflow` global · `movimientos_auditoria` · `fiscal_auditoria` (inmutable) · `ingesta_raw` con `idempotency_key` · logs de ejecución de n8n |
+| 6 | **Auditoría** | Dejar rastro de qué se hizo, cuándo, con qué herramienta y bajo qué permiso — y avisar cuando algo falla | `praxia.agent_errors` + `errorWorkflow` global · `movimientos_auditoria` · `fiscal_auditoria` (inmutable) · `fiscal_propuestas` con actor y propósito por fila · `ingesta_raw` con `idempotency_key` · logs de ejecución de n8n |
 | 7 | **Despliegue** | Correr 24/7, publicar con TLS, respaldar, y poder volver atrás | VPS propio · Docker Compose · Traefik con TLS · sin puertos publicados al host · backups diarios/semanales/mensuales con `manifest.json` y `restore_check.sh` |
 
 ### Cómo se relacionan
@@ -69,7 +69,7 @@ Las capas 6 y 7 no están "abajo" ni "arriba": son transversales. La auditoría 
 
 1. **La identidad se resuelve en la capa 1**, antes de gastar un token de modelo. Identidad por `chat_id` (**D-6**). Ver [modelo de permisos](modelo-de-permisos.md).
 2. **Las invariantes viven en la capa 5**, no en el prompt. Un trigger de PostgreSQL no alucina. Ver [cuándo uso SQL](../02-desglose-tecnico/01-cuando-uso-sql.md).
-3. **Cuatro acciones exigen un humano**: enviar mail, borrar, gastar y publicar (**D-7**). Ver [ADR-004](../04-decisiones/adr-004-aprobacion-humana-en-acciones-consecuentes.md).
+3. **Cuatro acciones exigen un humano**: enviar mail, borrar, gastar y publicar (**D-7**). Ver [ADR-004](../04-decisiones/adr-004-aprobacion-humana-en-acciones-consecuentes.md) y su especialización fiscal en el [ADR-010](../04-decisiones/adr-010-el-agente-propone-el-humano-decide.md), donde la separación deja de ser una regla de comportamiento y pasa a ser una credencial que el agente no tiene ([Agente Fiscal](../../systems/praxia-agente-fiscal/)).
 
 ---
 
@@ -79,8 +79,9 @@ Las capas 6 y 7 no están "abajo" ni "arriba": son transversales. La auditoría 
 |---|---|
 | Ver el sistema completo en un diagrama | [Visión general](vision-general.md) |
 | Ver la ficha de cada subsistema | [`systems/`](../../systems/) |
+| Ver cómo se acota un agente que opera sobre obligaciones fiscales | [`systems/praxia-agente-fiscal/`](../../systems/praxia-agente-fiscal/) |
 | Ver el SQL reconstruido | [`artifacts/sql/`](../../artifacts/sql/) |
 | Ver el prompt de sistema del orquestador | [`artifacts/prompts/`](../../artifacts/prompts/) |
 | Ver el método de trabajo con agentes de IA | [Gobernanza](../05-gobernanza/) |
 
-> Última verificación: 2026-08-05
+> Última verificación: 2026-08-06

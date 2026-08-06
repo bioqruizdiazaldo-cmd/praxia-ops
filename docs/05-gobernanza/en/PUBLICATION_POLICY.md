@@ -24,7 +24,7 @@ Everything else follows from that sentence. If an artefact teaches nothing, it i
 - **Verified public references, with attribution.** Other people's work is cited, not absorbed.
 - **SQL schemas with table and column names.** A table name is not a secret; its contents are.
 - **Contracts, state machines, decisions and chronology.** This is the method, and the method is the point.
-- **Aggregate metrics**: "554 tests", "217 workflows", "343 of 362 executions succeeded".
+- **Aggregate metrics**: "606 tests", "217 workflows", "343 of 362 executions succeeded".
 
 ---
 

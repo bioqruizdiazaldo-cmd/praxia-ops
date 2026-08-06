@@ -91,7 +91,7 @@ Que compartan instancia no significa que compartan permisos. El rol `praxia_fina
 - Backups, migraciones y monitoreo son compartidos: mejora la economía y concentra el riesgo.
 - Cualquier migración del esquema financiero debe seguir el [runbook de despliegue](../06-runbooks/despliegue-de-una-migracion.md), porque toca la misma base que la memoria.
 - La verificación de no-regresión del 05/08 —25 → 35 tablas con valores idénticos— cuenta tablas de **ambos** esquemas. Es la contracara concreta de compartir instancia.
-- Sin integración continua: los 554 tests se corren a mano antes de publicar.
+- Sin integración continua: los 606 tests se corren a mano antes de publicar.
 
 ### De seguridad
 
@@ -111,7 +111,7 @@ Que compartan instancia no significa que compartan permisos. El rol `praxia_fina
 | Rol `praxia_finanzas_rw` sin permiso `DELETE` | `Verificado` |
 | Backend Node.js ESM sin framework, `node:http`, router por regex, única dependencia `pg` | `Verificado` |
 | Frontend vanilla en un archivo de 1.911 líneas, 7 secciones | `Verificado` |
-| 554 casos de test en 27 archivos con `node --test` y PGlite sobre el esquema real | `Verificado` |
+| 606 casos de test en verde, 0 salteados, con `node --test` y PGlite sobre el esquema real | `Verificado` |
 | Único camino de alta `POST /api/ingesta`; cita textual del contrato universal | `Verificado` |
 | Esquema en v4.8 al 2026-08-05, diez días después de la decisión | `Verificado` |
 | Datos sensibles cifrados con token de reemplazo antes del modelo | `Verificado` |

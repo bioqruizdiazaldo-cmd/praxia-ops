@@ -2,7 +2,7 @@
 
 Los números duros del sistema, cada uno con su fecha de corte y su fuente — y un párrafo honesto sobre qué no miden.
 
-Todas las cifras salen de una inspección directa de artefactos el 2026-08-05, salvo donde se indique otra fecha de corte. Ningún número está proyectado ni redondeado hacia arriba.
+Todas las cifras salen de una inspección directa de artefactos el 2026-08-05, salvo donde se indique otra fecha de corte — las del subsistema fiscal se reverificaron el 2026-08-06. Ningún número está proyectado ni redondeado hacia arriba.
 
 ## Runtime n8n
 
@@ -38,11 +38,14 @@ La ventana de retención es de 7 días y 377 no es el total histórico de ejecuc
 
 | Métrica | Valor | Fecha de corte | Evidencia |
 |---|---|---|---|
-| Tablas en producción (post puesta al día) | 35 | 2026-08-05 | `Verificado` |
-| Tablas en producción (pre puesta al día) | 25 | 2026-08-05 | `Verificado` |
+| Tablas en producción | **39** | 2026-08-06 | `Verificado` |
+| Tablas en producción (post puesta al día del 05/08) | 35 | 2026-08-05 | `Verificado` |
+| Tablas en producción (pre puesta al día del 05/08) | 25 | 2026-08-05 | `Verificado` |
+| Migraciones SQL versionadas | **40+** | 2026-08-06 | `Verificado` |
 | Migraciones SQL sin control de versiones al checkpoint | 33 | 2026-07-28 | `Verificado` |
 | Líneas de JavaScript sin control de versiones al checkpoint | 3.275 | 2026-07-28 | `Verificado` |
-| Versión del esquema `praxia_finanzas` | v4.8 | 2026-08-05 | `Verificado` |
+| Versión del esquema `praxia_finanzas` en producción | **v4.13** | 2026-08-06 | `Verificado` |
+| Versión del esquema `praxia_finanzas` al cierre del 05/08 | v4.8 | 2026-08-05 | `Verificado` |
 | Migraciones de atraso detectadas en el drift | 3 (v4.4 → v4.6) | 2026-08-05 | `Verificado` |
 | Días de drift entre repositorio y servidor | 5 (31/07 → 05/08) | 2026-08-05 | `Verificado` |
 | Versión de PostgreSQL | 16 | 2026-08-05 | `Verificado` |
@@ -68,12 +71,16 @@ Veintiséis hechos después de 17 días de uso es un número deliberadamente chi
 
 | Métrica | Valor | Fecha de corte | Evidencia |
 |---|---|---|---|
-| Casos de test | 554 | 2026-08-05 | `Verificado` |
-| Archivos de test | 27 | 2026-08-05 | `Verificado` |
+| Casos de test | **606 verdes, 0 salteados** | 2026-08-05 | `Verificado` |
+| Archivos de test | — | | `Pendiente de verificar` |
+| Casos de test directamente fiscales | ~196 en 11 archivos | 2026-08-06 | `Verificado` |
 | Casos de test en el cierre de Fase 3 | 141/141 | 2026-07-28 | `Verificado` |
 | Endpoints HTTP declarados | 60+ | 2026-08-05 | `Verificado` |
 | Endpoints `DELETE` | 0 | 2026-08-05 | `Verificado` |
 | Operaciones de la capa fiscal de solo lectura | 9 | 2026-08-04 | `Verificado` |
+| Detectores de discrepancias de la capa fiscal | 13 | 2026-08-06 | `Verificado` |
+| Códigos de abstención del contrato fiscal | 9 | 2026-08-04 | `Verificado` |
+| Tablas que el agente fiscal puede escribir | 1 (`fiscal_propuestas`) | 2026-08-06 | `Verificado` |
 | Herramientas MCP | 22 | 2026-08-05 | `Verificado` |
 | Scopes OAuth del servidor MCP | 4 | 2026-08-05 | `Verificado` |
 | Herramientas MCP que exigen confirmación explícita | 4 (`praxia.modify`) | 2026-08-05 | `Verificado` |
@@ -86,6 +93,8 @@ Veintiséis hechos después de 17 días de uso es un número deliberadamente chi
 | Versión del contrato Finanzas↔Fiscal | 1.0 | 2026-08-04 | `Verificado` |
 
 El reparto de las 22 herramientas MCP por scope: 8 en `praxia.read`, 10 en `praxia.fiscal.read`, 1 en `praxia.write`, 4 en `praxia.modify`. **Dieciocho de veintidós son de solo lectura.** Eso es una decisión de diseño, no una limitación pendiente de completar.
+
+La suite creció así en dos días: **405** casos al empezar el 2026-08-04 → **472** al cerrar la capa de lectura fiscal → **492** con la v4.7 → **606** con la v4.8 y el motor, el 2026-08-05. El salto de 492 a 606 es casi todo cobertura del subsistema fiscal.
 
 ## Verificaciones y pruebas puntuales
 
@@ -116,6 +125,7 @@ Dos de esos 79 workflows con nombre de laboratorio estaban activos y recibiendo 
 | Días desde el primer día de laboratorio al corte | 27 (10/07 → 05/08) | `Verificado` |
 | Días desde el nacimiento del orquestador al corte | 22 (14/07 → 05/08) | `Verificado` |
 | Días desde el nacimiento de Finanzas a v4.8 | 10 (26/07 → 05/08) | `Verificado` |
+| Días desde el nacimiento de Finanzas a v4.13 | 11 (26/07 → 06/08) | `Verificado` |
 | Días de código en producción sin control de versiones | 11 (17/07 → 28/07) | `Inferido` |
 | Etapas del proyecto | 4 | `Inferido` (agrupación propia de esta documentación) |
 
@@ -123,9 +133,9 @@ Dos de esos 79 workflows con nombre de laboratorio estaban activos y recibiendo 
 
 Esta es la parte importante de la página, y conviene leerla antes que las tablas.
 
-**Ninguna de estas métricas mide si el sistema es bueno.** Miden volumen y actividad. 217 workflows no es mejor que 40: de hecho es peor, porque 125 de ellos tienen nomenclatura de laboratorio y conviven con producción. El número grande es un síntoma de la deuda, no una prueba de capacidad. Lo mismo con las 35 tablas: son las que hacen falta para el dominio, y si mañana fueran 60 no significaría que el sistema sirve más.
+**Ninguna de estas métricas mide si el sistema es bueno.** Miden volumen y actividad. 217 workflows no es mejor que 40: de hecho es peor, porque 125 de ellos tienen nomenclatura de laboratorio y conviven con producción. El número grande es un síntoma de la deuda, no una prueba de capacidad. Lo mismo con las 39 tablas: son las que hacen falta para el dominio, y si mañana fueran 60 no significaría que el sistema sirve más.
 
-**554 tests no significan cobertura.** Es un conteo de casos, no un porcentaje de líneas ni de ramas ejecutadas. La cobertura real está `Pendiente de verificar`, y hay huecos declarados: no hay tests de interfaz de usuario, no hay tests de carga, no hay evaluación sistemática y automatizada del comportamiento del modelo, y no hay integración continua — los tests se corren a mano antes de publicar. Un número de casos alto con esos huecos describe un sistema bien probado *en su lógica determinística* y sin verificar en todo lo demás.
+**606 tests no significan cobertura.** Es un conteo de casos, no un porcentaje de líneas ni de ramas ejecutadas. La cobertura real está `Pendiente de verificar`, y hay huecos declarados: no hay tests de interfaz de usuario, no hay tests de carga, no hay evaluación sistemática y automatizada del comportamiento del modelo, y no hay integración continua — los tests se corren a mano antes de publicar. Un número de casos alto con esos huecos describe un sistema bien probado *en su lógica determinística* y sin verificar en todo lo demás. Que 114 de esos casos hayan aparecido en un solo día, con la v4.8, tampoco es una virtud: mide velocidad, no confianza.
 
 **La tasa de éxito del 94,8% es de una ventana de 7 días y no distingue causas.** Diecinueve ejecuciones fallidas pueden ser un timeout de un servicio externo o pueden ser un bug de lógica; el número no lo dice. Tampoco hay objetivos de nivel de servicio declarados, así que no existe una referencia contra la cual ese 94,8% sea bueno o malo. Es un dato, no una evaluación.
 
@@ -137,4 +147,4 @@ Esta es la parte importante de la página, y conviene leerla antes que las tabla
 
 **Lo que sí muestran, leídas juntas:** un sistema chico en volumen de datos, denso en reglas, con la lógica empujada hacia lo determinístico, con superficie de escritura deliberadamente mínima, construido rápido, y con las deudas contadas en vez de escondidas.
 
-> Última verificación: 2026-08-05
+> Última verificación: 2026-08-06

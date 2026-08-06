@@ -1,6 +1,6 @@
 # Runbooks
 
-Procedimientos operativos reales: dos incidentes con su análisis y tres procedimientos reutilizables que salieron de ellos.
+Procedimientos operativos reales: tres incidentes con su análisis y cuatro procedimientos reutilizables.
 
 ## Qué hay acá y qué no
 
@@ -11,7 +11,7 @@ Esta sección tiene dos tipos de documento:
 - **Incidentes y post-mortems** — qué pasó, por qué, cómo se arregló y qué se aprendió. Se leen una vez y se releen cuando algo se parece.
 - **Procedimientos** — pasos con casillas de verificación, criterios de parada y rollback. Se leen cada vez que se ejecuta la tarea.
 
-Los tres procedimientos existen porque los dos incidentes ocurrieron. Ése es el orden real de las cosas: primero se rompe algo, después se escribe el procedimiento.
+Casi todos los procedimientos existen porque antes ocurrió un incidente. Ése es el orden real de las cosas: primero se rompe algo, después se escribe el procedimiento. El cierre fiscal mensual es la excepción parcial — se escribió para una tarea recurrente, pero varios de sus criterios de parada salen del [post-mortem de `estado_fiscal`](postmortem-estado-fiscal-divergente.md).
 
 ## Índice
 
@@ -22,6 +22,8 @@ Los tres procedimientos existen porque los dos incidentes ocurrieron. Ése es el
 | [Desplegar una migración](despliegue-de-una-migracion.md) | Procedimiento | **Siempre** que se aplique un cambio de esquema a producción |
 | [Publicar un workflow de n8n](publicar-un-workflow-n8n.md) | Procedimiento | Antes de activar o modificar cualquier workflow en producción |
 | [Limpieza de runtime](limpieza-de-runtime.md) | Procedimiento | Cuando el runtime acumule workflows viejos y haya tentación de borrar por patrón de nombre |
+| [Post-mortem: `estado_fiscal` divergente](postmortem-estado-fiscal-divergente.md) | Post-mortem | Cuando dos partes del sistema respondan distinto a la misma pregunta, o antes de escribir una validación en código |
+| [Cierre fiscal mensual](cierre-fiscal-mensual.md) | Procedimiento | **Todos los meses**, para cerrar un período fiscal de punta a punta |
 
 ## Cuándo usar cada uno
 
@@ -33,6 +35,7 @@ Los tres procedimientos existen porque los dos incidentes ocurrieron. Ése es el
 | Una consulta devuelve una columna que no existe, o una funcionalidad nueva no anda en el servidor | [Post-mortem de drift](postmortem-drift-produccion.md) — verificá el estado del esquema desplegado antes de depurar el código |
 | Un workflow se ejecuta de más, de menos, o dos veces | [Limpieza de runtime](limpieza-de-runtime.md) — puede haber una versión vieja activa en paralelo |
 | Algo se rompió después de un cambio de esquema | [Desplegar una migración](despliegue-de-una-migracion.md), sección de rollback |
+| Un cierre fiscal no avanza, o dos partes del sistema dicen cosas distintas del mismo movimiento | [Post-mortem de `estado_fiscal`](postmortem-estado-fiscal-divergente.md) y el paso 5 del [cierre mensual](cierre-fiscal-mensual.md) |
 
 ### Vas a hacer un cambio
 
@@ -42,8 +45,10 @@ Los tres procedimientos existen porque los dos incidentes ocurrieron. Ése es el
 | Activar o modificar un workflow | [Publicar un workflow](publicar-un-workflow-n8n.md), los 10 pasos |
 | Borrar workflows viejos | [Limpieza de runtime](limpieza-de-runtime.md). **No borres nada sin inventario previo** |
 | Diseñar un pipeline nuevo que descargue o procese archivos | [Incidente PDF](incidente-pdf-telegram.md), sección de hallazgo estructural |
+| Cerrar un período fiscal | [Cierre fiscal mensual](cierre-fiscal-mensual.md), completo, con las casillas |
+| Escribir una validación de negocio en código | [Post-mortem de `estado_fiscal`](postmortem-estado-fiscal-divergente.md) y el [ADR-012](../04-decisiones/adr-012-la-invariante-vive-en-la-base.md) antes de decidir dónde vive |
 
-## Los principios que comparten los cinco
+## Los principios que comparten los siete
 
 Salieron de la práctica, no de un manual:
 
@@ -53,6 +58,7 @@ Salieron de la práctica, no de un manual:
 4. **Rollback disponible y conocido antes de empezar.** Si no sabés cómo volver, todavía no estás listo para avanzar.
 5. **Inventario antes de destruir.** Dos de 79 workflows con nombre de laboratorio estaban activos y recibiendo tráfico.
 6. **Los estados terminales de falla son estados legítimos.** Un pipeline que sólo modela el éxito deja casos colgados para siempre.
+7. **Lo que tiene que ser siempre cierto se garantiza donde pasan todos los caminos.** Una validación escrita en código y nunca ejecutada no protege: hace creer que protege.
 
 ## Nota sobre los ejemplos
 

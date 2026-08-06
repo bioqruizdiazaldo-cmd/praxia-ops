@@ -228,7 +228,7 @@ Las brechas 7 y 9 tienen algo en común: son las dos que se activan al escalar. 
 Es tan importante como lo que sí:
 
 - **RAG vectorial.** La memoria funciona con full-text en español y un gate determinístico. No hay evidencia de que haga falta. Ver [ADR-003](../04-decisiones/adr-003-memoria-en-capas-sin-rag-vectorial.md).
-- **Framework en el backend de Finanzas.** `node:http` puro con una sola dependencia de runtime funciona y tiene 554 tests. Cambiarlo sería trabajo sin beneficio.
+- **Framework en el backend de Finanzas.** `node:http` puro con una sola dependencia de runtime funciona y tiene 606 tests. Cambiarlo sería trabajo sin beneficio.
 - **Reescribir el dashboard.** El prototipo UI v3 está aprobado en diseño y **no migrado**, y así queda: es la Fase 6 del ADR, no una urgencia.
 - **Republicar el Buscador General.** Sacó 2/7 con exigencia declarada de 7/7. No se publica hasta que dé 7/7. Ver [ADR-006](../04-decisiones/adr-006-buscador-general-no-publicado.md).
 - **Más agentes.** El orden de construcción decidido es Oppenheimer → PraxIA Ops → Ciencia Aplicada → agente de la segunda persona → marca outdoor → clientes, y no se avanza hasta cerrar las brechas 1 a 5.

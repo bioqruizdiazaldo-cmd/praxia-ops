@@ -13,7 +13,7 @@ La política de publicación de la que deriva es del 2026-08-03, dentro de la l�
 
 ## Contexto
 
-Al 3 de agosto había un sistema en producción con material genuinamente interesante para mostrar: un orquestador con subagentes, memoria persistente sin embeddings, un núcleo fiscal con invariantes en la base, 554 tests, un incidente reparado con máquina de estados y un componente rechazado por no pasar sus pruebas.
+Al 3 de agosto había un sistema en producción con material genuinamente interesante para mostrar: un orquestador con subagentes, memoria persistente sin embeddings, un núcleo fiscal con invariantes en la base, una suite de tests contra el esquema real, un incidente reparado con máquina de estados y un componente rechazado por no pasar sus pruebas.
 
 Y había un problema evidente. Ese material está entretejido con lo que no puede salir: agenda y correo personales, movimientos financieros reales, datos fiscales, credenciales, la topología del VPS, identificadores de canal, nombres de personas.
 
@@ -83,7 +83,7 @@ Un `Pendiente de verificar` visible vale más que un párrafo bien escrito que n
 
 ### Publicar los fracasos es parte de la política, no una concesión
 
-Es la parte contraintuitiva y la que le da valor al resto. Un repositorio que sólo muestra éxitos **no permite evaluar el criterio de quien lo escribió**. El [ADR-006](adr-006-buscador-general-no-publicado.md) —un componente terminado que no se publicó por 2/7— dice más sobre cómo se trabaja acá que los 554 tests.
+Es la parte contraintuitiva y la que le da valor al resto. Un repositorio que sólo muestra éxitos **no permite evaluar el criterio de quien lo escribió**. El [ADR-006](adr-006-buscador-general-no-publicado.md) —un componente terminado que no se publicó por 2/7— dice más sobre cómo se trabaja acá que los 606 tests.
 
 Lo mismo con las diez deudas abiertas que están publicadas tal cual: sin separación de ambientes, backups sin ensayo de restauración, el `errorWorkflow` que todavía se llama `[TEST]`, dos proyectos que resuelven el mismo problema, un token que requiere rotación. Nada de eso mejora la apariencia del sistema. Todo eso mejora la credibilidad de lo que sí se afirma.
 
@@ -111,7 +111,7 @@ Lo mismo con las diez deudas abiertas que están publicadas tal cual: sin separa
 
 - **Cuesta mucho más trabajo** que exportar y tachar. Cada artefacto se reescribe.
 - **Es menos impresionante para quien busca código.** No hay un repositorio que se pueda clonar y correr.
-- **Requiere confianza en las afirmaciones.** Nadie puede verificar desde afuera que haya 554 tests. La mitigación es el vocabulario de evidencia y la publicación de las deudas: **un documento que declara sus propios huecos es más creíble que uno que no declara ninguno**.
+- **Requiere confianza en las afirmaciones.** Nadie puede verificar desde afuera que haya 606 tests. La mitigación es el vocabulario de evidencia y la publicación de las deudas: **un documento que declara sus propios huecos es más creíble que uno que no declara ninguno**.
 - Hay material que no se puede publicar de ninguna forma y que era interesante — el contenido fiscal concreto, por ejemplo.
 
 ### Operativas

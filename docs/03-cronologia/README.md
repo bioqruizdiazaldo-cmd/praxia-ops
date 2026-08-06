@@ -31,9 +31,9 @@ Seis días de construcción intensa. Nace el orquestador Oppenheimer y sus subag
 
 La etapa más larga y la que más se parece a ingeniería de verdad. Se centraliza el manejo de errores, se valida la aprobación humana en el envío de mails, se rompe el pipeline con un PDF de 21,9 MB y se repara con una máquina de estados, se inventarían 79 workflows de laboratorio antes de tocar nada, se construye un buscador web y se decide **no publicarlo** porque pasó 2 de 7 pruebas. Cierra con el checkpoint que descubre que no había repositorio git.
 
-### Etapa 4 — Producto (28 de julio al 5 de agosto)
+### Etapa 4 — Producto (28 de julio al 6 de agosto)
 
-Nueve días de consolidación: commit inicial, migraciones v4.0 a v4.8, servidor MCP versionado, contrato Finanzas↔Fiscal, línea base de gobernanza en 18 documentos y un post-mortem de drift entre repositorio y servidor. Termina con un agente que propone clasificaciones fiscales a partir de precedentes del propio dueño.
+Diez días de consolidación: commit inicial, migraciones v4.0 a v4.13, servidor MCP versionado, contrato Finanzas↔Fiscal, línea base de gobernanza en 18 documentos y un post-mortem de drift entre repositorio y servidor. Termina con un agente que propone clasificaciones fiscales a partir de precedentes del propio dueño.
 
 ## Índice
 

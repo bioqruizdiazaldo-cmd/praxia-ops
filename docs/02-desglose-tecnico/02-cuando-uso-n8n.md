@@ -132,7 +132,7 @@ Siete estados en vez de "respuesta o error" es lo que permite que el orquestador
 
 El olor no es el nodo `Code`: es el nodo `Code` **que crece**. Un nodo de 200 líneas dentro de un workflow es código sin tests, sin revisión y sin diff legible. Todo lo malo de escribir código sin nada de lo bueno.
 
-En este sistema la línea se trazó así: las transformaciones y los gates viven en nodos `Code`; la lógica financiera vive en `api/server.mjs` (~70 KB, Node.js ESM sin framework) con 554 tests que la cubren. n8n llama a la API; no la reimplementa.
+En este sistema la línea se trazó así: las transformaciones y los gates viven en nodos `Code`; la lógica financiera vive en `api/server.mjs` (~70 KB, Node.js ESM sin framework) con 606 tests que la cubren. n8n llama a la API; no la reimplementa.
 
 ### Los límites que este sistema efectivamente pegó
 

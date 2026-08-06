@@ -19,16 +19,16 @@ Este repositorio es la **documentación ordenada, sanitizada y verificable** de 
 
 ---
 
-## Números del sistema (corte 2026-08-05)
+## Números del sistema (corte 2026-08-06)
 
 | Métrica | Valor |
 |---|---|
 | Agentes en producción | 1 orquestador + 15 subagentes/workflows |
 | Workflows n8n registrados / activos | 217 / 25 |
 | Ejecuciones conservadas (ventana 7 días) | 377 — 343 exitosas, 19 fallidas |
-| Migraciones SQL versionadas | 33+ (esquema fiscal en v4.8) |
-| Tablas en producción | 35 |
-| Casos de test automatizados | 554 (`node --test` + PGlite) |
+| Migraciones SQL versionadas | 40+ (esquema fiscal en v4.13) |
+| Tablas en producción | 39 |
+| Casos de test automatizados | 606 verdes, 0 salteados (`node --test` + PGlite) |
 | Endpoints HTTP en la API financiera | 60+, ninguno `DELETE` |
 | Herramientas MCP expuestas | 22, en 4 scopes OAuth |
 | Días desde el primer workflow al sistema actual | 22 |
@@ -44,6 +44,7 @@ Este repositorio es la **documentación ordenada, sanitizada y verificable** de 
 | Entender qué hace el sistema y cómo se usa | **[Manual de usuario](docs/00-manual-de-usuario/)** |
 | Ver la arquitectura | [Arquitectura](docs/01-arquitectura/) |
 | Saber **cuándo uso SQL, cuándo n8n, cuándo un subagente** | **[Desglose técnico](docs/02-desglose-tecnico/)** |
+| Ver cómo se le pone freno a un agente que opera sobre algo que importa | **[Agente Fiscal](systems/praxia-agente-fiscal/)** |
 | Ver cómo se construyó, día por día | [Cronología](docs/03-cronologia/) |
 | Ver las decisiones y por qué | [Decisiones (ADR)](docs/04-decisiones/) |
 | Ver el método de trabajo con agentes de IA | [Gobernanza](docs/05-gobernanza/) |
@@ -56,7 +57,8 @@ Este repositorio es la **documentación ordenada, sanitizada y verificable** de 
 |---|---|---|
 | [`systems/oppenheimer`](systems/oppenheimer/) | Agente personal: Telegram, voz, imagen, PDF, mail, agenda, papers, búsqueda web | Producción |
 | [`systems/praxia-memory-core`](systems/praxia-memory-core/) | Memoria persistente en PostgreSQL + espejo Markdown | Producción |
-| [`systems/praxia-finanzas`](systems/praxia-finanzas/) | Finanzas y núcleo fiscal: API, dashboard, MCP, 554 tests | Producción |
+| [`systems/praxia-finanzas`](systems/praxia-finanzas/) | Finanzas y núcleo fiscal: API, dashboard, MCP, 606 tests | Producción |
+| [`systems/praxia-agente-fiscal`](systems/praxia-agente-fiscal/) | Agente fiscal: contrato de solo lectura, motor de precedentes, propuestas con aprobación humana | Producción |
 | [`systems/ai-command-center`](systems/ai-command-center/) | Fábrica de contenido multimarca | Diseño (Fase 0) |
 
 ### Artefactos
@@ -98,6 +100,7 @@ Este no es un portafolio de tutoriales terminados. Es el registro de un sistema 
 - Un PDF de 21,9 MB que rompió el pipeline de Telegram, y la reparación con estados explícitos ([incidente](docs/06-runbooks/incidente-pdf-telegram.md)).
 - Un buscador web que pasó 2 de 7 pruebas reales y **no se publicó** ([decisión](docs/04-decisiones/adr-006-buscador-general-no-publicado.md)).
 - Producción tres migraciones atrás durante cinco días, porque se miraba el repositorio y no el servidor ([post-mortem](docs/06-runbooks/postmortem-drift-produccion.md)).
+- Veintidós movimientos bien clasificados y sin clasificar al mismo tiempo: `estado_fiscal` divergía de los campos que lo determinan, y la corrección fue derivarlo en la base en vez de recordarlo en la aplicación ([post-mortem](docs/06-runbooks/postmortem-estado-fiscal-divergente.md)).
 - 73 workflows de laboratorio conviviendo con producción, inventariados y clasificados antes de tocar nada.
 
 Un sistema que solo muestra sus éxitos no está documentado: está publicitado.

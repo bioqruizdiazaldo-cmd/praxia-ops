@@ -17,6 +17,7 @@ Acá vas a encontrar:
 - Qué recuerda la memoria y qué tiene prohibido guardar.
 - Qué corre solo, a qué hora.
 - Qué hacer cuando algo no anda.
+- Cómo se pide el diagnóstico fiscal de un mes y cómo se deciden las propuestas del Agente Fiscal.
 
 ## Cómo leerlo
 
@@ -40,6 +41,7 @@ Todo el manual está escrito con corte al **2026-08-05**. Lo que no pudimos veri
 | 06 | [Rutinas automáticas](06-rutinas-automaticas.md) | Lo que corre solo: briefings, exports, alertas y avisos |
 | 07 | [Cuando algo falla](07-cuando-algo-falla.md) | Síntoma → causa probable → qué hacer |
 | 08 | [Glosario](08-glosario.md) | Los términos que aparecen en todo el repo, en criollo |
+| 09 | [El Agente Fiscal — guía de uso](09-agente-fiscal-guia-de-uso.md) | Diagnóstico de un mes, propuestas, aprobación y qué bloquea un cierre |
 
 ## Quiero hacer X → andá a Y
 
@@ -57,6 +59,9 @@ Todo el manual está escrito con corte al **2026-08-05**. Lo que no pudimos veri
 | Importar un resumen en PDF, CSV o Excel | [04 — Importar documentos](04-praxia-finanzas-guia-de-uso.md#importar-un-documento) |
 | Anotar una deuda y después pagarla | [04 — Deudas y pagos](04-praxia-finanzas-guia-de-uso.md#deudas-y-pagos) |
 | Cerrar un período fiscal | [04 — Cierre fiscal](04-praxia-finanzas-guia-de-uso.md#cierre-fiscal-y-propuestas-del-agente) |
+| Pedir el diagnóstico fiscal de un mes | [09 — Pedirle el diagnóstico de un mes](09-agente-fiscal-guia-de-uso.md#pedirle-el-diagnóstico-de-un-mes) |
+| Aprobar o rechazar una propuesta del Agente Fiscal | [09 — Las propuestas](09-agente-fiscal-guia-de-uso.md#las-propuestas) |
+| Entender por qué un cierre no avanza | [09 — Qué bloquea un cierre](09-agente-fiscal-guia-de-uso.md#qué-bloquea-un-cierre-y-cómo-destrabarlo) |
 | Que se acuerde de algo importante | [05 — Pedirle que recuerde](05-memoria-que-recuerda-y-que-no.md#cómo-pedirle-que-recuerde-algo) |
 | Que se olvide de algo | [05 — Pedirle que olvide](05-memoria-que-recuerda-y-que-no.md#cómo-pedirle-que-olvide-algo) |
 | Leer la memoria fuera de Telegram | [05 — Dónde ver la memoria](05-memoria-que-recuerda-y-que-no.md#dónde-ver-la-memoria-en-obsidian) |

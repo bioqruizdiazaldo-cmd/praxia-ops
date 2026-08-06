@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS praxia_finanzas.movimientos (
     deducible     boolean      NOT NULL DEFAULT false,
 
     -- Derivado por trigger a partir de ambito + deducible (v4.7).
-    -- No se escribe a mano: ver 04-invariantes-y-triggers.sql
+    -- No se escribe a mano: ver 08-cierre-y-estado-derivado.sql
     estado_fiscal text         NOT NULL DEFAULT 'no_fiscal'
                                CHECK (estado_fiscal IN ('no_fiscal',
                                                         'fiscal_no_deducible',

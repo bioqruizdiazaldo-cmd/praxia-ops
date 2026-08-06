@@ -46,7 +46,7 @@ PraxIA Finanzas usa PostgreSQL 16 con el esquema `praxia_finanzas` dentro de la 
 
 > *"PraxIA Contable debe construirse como un esquema adicional dentro del PostgreSQL que ya corre en el VPS. Reutiliza ~80% de infraestructura existente. Construir una app aparte sería tirar a la basura el Memory Core."*
 
-El esquema está en **v4.8** con **33+ migraciones** versionadas y **35 tablas** en producción al corte.
+El esquema está en **v4.13** con **40+ migraciones** versionadas y **39 tablas** en producción al corte.
 
 ### Contratos de datos: la tabla como interfaz
 
@@ -112,6 +112,15 @@ El motivo es una regla de diseño que vale la pena citar entera:
 
 Si el contenido de una propuesta fuera mutable, el agente podría cambiarla después de que la mirás y antes de que la aprobás. La inmutabilidad no es una optimización: es el mecanismo que hace que la aprobación humana signifique algo.
 
+Los tres triggers cubren tres agujeros distintos del mismo circuito, y ninguno es reemplazable por los otros dos:
+
+| Trigger | Momento | Invariante |
+|---|---|---|
+| `propuesta_nace_pendiente` | `BEFORE INSERT` | Ninguna propuesta puede insertarse ya aprobada. *"Aprobar es un acto humano posterior, no un valor inicial"* |
+| `propuesta_contenido_inmutable` | `BEFORE UPDATE` | Una vez que la propuesta deja de estar pendiente, catorce columnas quedan congeladas. Lo aprobado es exactamente lo que se mostró |
+| `propuesta_transicion_valida` | `BEFORE UPDATE` | `pendiente` puede ir a `aprobada`, `rechazada` o `caducada`; los tres son terminales. Cambiar de idea se hace con una propuesta nueva que apunta a la anterior, no reescribiendo la vieja |
+
+
 ### Funciones: lógica determinística con una sola puerta
 
 **`fx_vigente()`** resuelve el tipo de cambio de una fecha. La regla asociada, textual:
@@ -141,6 +150,8 @@ $$;
 ```
 
 Convertir un campo seteable en un campo derivado es la forma más barata de eliminar una familia entera de inconsistencias. Vale la pena buscar activamente estos casos.
+
+Este en particular se pagó en incidente: el 2026-08-05 se clasificaron 22 movimientos que quedaron con `ambito` y `deducible` correctos y `estado_fiscal='sin_clasificar'`. El agente fiscal los veía clasificados y el cierre los seguía marcando como bloqueantes. La regla ya estaba escrita en el código y no alcanzó, porque el código no es el único camino: *"el día que alguien escriba `ambito` por otra vía —una importación, un flujo de n8n, un `psql` suelto— vuelven a divergir. Lo que hace falta es que no puedan."* La migración además corrige las filas ya incoherentes y verifica en un bloque `DO $$` que no quede ninguna, con `RAISE EXCEPTION` si las hay. Detalle completo en el [post-mortem del `estado_fiscal` divergente](../06-runbooks/postmortem-estado-fiscal-divergente.md).
 
 ### Vistas como API de lectura
 
@@ -189,7 +200,7 @@ Cuatro decisiones acá, cada una con motivo:
 
 ### Migraciones numeradas y `schema_migrations`
 
-Cada cambio de esquema es un archivo numerado que se aplica en orden, y la tabla `schema_migrations` registra qué se aplicó. El recorrido está en la cronología: DDL v3.1 → v3.2..v3.6 → v4.0 → v4.2 → v4.3 → v4.4 → v4.5 → v4.6 → v4.7 → v4.8.
+Cada cambio de esquema es un archivo numerado que se aplica en orden, y la tabla `schema_migrations` registra qué se aplicó. El recorrido está en la cronología: DDL v3.1 → v3.2..v3.6 → v4.0 → v4.2 → v4.3 → v4.4 → v4.5 → v4.6 → v4.7 → v4.8 → v4.9..v4.13.
 
 Cómo se aplican, en producción:
 
@@ -227,4 +238,4 @@ El razonamiento: si la aplicación no necesita borrar, el rol de la aplicación 
 
 Si la invariante no puede romperse nunca, va en la base. La aplicación produce buenos mensajes de error; la base produce garantías, y son cosas distintas.
 
-> Última verificación: 2026-08-05
+> Última verificación: 2026-08-06

@@ -57,7 +57,7 @@ Lo que se pierde, sin adornos:
 - **El router por regex escala mal.** Con 60+ rutas, el orden importa y una regex ambigua es un bug sutil. Hay tests de **delegación de rutas fiscales** justamente por esto: no testean lógica, testean que la ruta llegue al handler correcto.
 - **Es contracultural.** Un dev que llega espera Express o Fastify.
 
-El balance se sostiene por el tamaño: un archivo de 70 KB con un dominio acotado y 554 tests es mantenible. Al doble, la decisión habría que revisarla.
+El balance se sostiene por el tamaño: un archivo de 70 KB con un dominio acotado y 606 tests es mantenible. Al doble, la decisión habría que revisarla.
 
 ### El contrato universal de ingesta
 
@@ -149,7 +149,7 @@ Dos criterios acá:
 2. **Fuente para los adaptadores.** Quien escribe un cliente lee el YAML.
 3. **Objeto de revisión.** Un cambio en el contrato es un diff en el YAML. Esto es exactamente lo que los workflows de n8n **no** tienen, y es la mitad del argumento para tener una API propia: la lógica financiera vive en un artefacto con diffs legibles.
 
-**Nota de honestidad**: el paquete es `praxia-contable@0.2.0` y el OpenAPI declara `PraxIA Finanzas 3.6.0`, mientras el esquema de base va por v4.8. Tres versionados distintos que no están alineados. No es crítico —cada uno versiona una cosa distinta— pero es deuda de coherencia y conviene declararla. `[PENDIENTE DE VERIFICAR: política de versionado unificada]`
+**Nota de honestidad**: el paquete es `praxia-contable@0.2.0` y el OpenAPI declara `PraxIA Finanzas 3.6.0`, mientras el esquema de base va por v4.13. Tres versionados distintos que no están alineados. No es crítico —cada uno versiona una cosa distinta— pero es deuda de coherencia y conviene declararla. `[PENDIENTE DE VERIFICAR: política de versionado unificada]`
 
 ### Qué NO está en la API
 

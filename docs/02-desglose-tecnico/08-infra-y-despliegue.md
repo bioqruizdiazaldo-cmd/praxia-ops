@@ -86,7 +86,7 @@ SSH quedó **cerrado tras el despliegue verificado del 2026-07-23**. La operaci�
 
 ### Backups
 
-Diarios, en `/opt/praxia/backups/{daily,weekly,monthly}`, con tres piezas:
+Diarios, en `<ruta-de-despliegue>/backups/{daily,weekly,monthly}`, con tres piezas:
 
 - **Lock** — impide que dos corridas se pisen. Sin lock, una corrida lenta que se solapa con la siguiente produce archivos truncados que parecen válidos.
 - **`manifest.json`** — qué contiene, cuándo se hizo, con qué versión de esquema. Un backup sin manifest obliga a abrirlo para saber qué es.
@@ -104,8 +104,8 @@ El procedimiento completo, tal como se ejecutó en la puesta al día del **2026-
 # SINTÉTICO — el procedimiento, con valores de ejemplo
 
 # 1. Backup con verificación de integridad
-pg_dump -Fc -d praxia_memory -f /opt/praxia/backups/pre-v46.dump
-sha256sum /opt/praxia/backups/pre-v46.dump | tee pre-v46.sha256
+pg_dump -Fc -d praxia_memory -f <ruta-de-despliegue>/backups/pre-v46.dump
+sha256sum <ruta-de-despliegue>/backups/pre-v46.dump | tee pre-v46.sha256
 
 # 2. Línea base: contar antes
 psql -d praxia_memory -Atc "

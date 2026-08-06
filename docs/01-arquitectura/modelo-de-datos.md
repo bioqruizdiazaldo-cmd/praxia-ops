@@ -22,7 +22,7 @@ El resultado: una base `praxia_memory`, dos esquemas, dos roles, dos conjuntos d
 | **Si falta un dato** | El agente dice que no lo tiene registrado | Ausencia de fila, nunca un cero |
 | **Borrado** | `active = false` (baja lógica) | Físicamente prohibido por trigger |
 | **Rol de base** | Escritura desde n8n | `praxia_finanzas_rw`, **sin `DELETE`** |
-| **Versión** | Esquema v1 (2026-07-16), estable | v4.8 (2026-08-05), 35 tablas |
+| **Versión** | Esquema v1 (2026-07-16), estable | v4.13 (2026-08-06), 39 tablas |
 
 La distinción de fondo: **la memoria puede equivocarse y corregirse; la contabilidad no puede equivocarse en silencio.**
 
@@ -263,7 +263,7 @@ Previstas en el diseño original y aún no pobladas: `papers`, `content_calendar
 
 ## Esquema `praxia_finanzas` — el dinero
 
-35 tablas al 2026-08-05, construidas en once migraciones desde el DDL v3.1 del 2026-07-27.
+39 tablas al 2026-08-06, construidas en dieciocho migraciones desde el DDL v3.1 del 2026-07-27.
 
 ### Núcleo
 
@@ -280,6 +280,7 @@ Previstas en el diseño original y aún no pobladas: `papers`, `content_calendar
 | v4.6 | Recurrencias y planes: `plantillas_recurrentes`, `planes_pago`, `generacion_ejecuciones`. Identidad de ocurrencia `(plantilla_id, occurrence_key)` |
 | v4.7 | `estado_fiscal` **derivado** de `ambito` + `deducible`. Ya no puede divergir |
 | v4.8 | `fiscal_propuestas` con `huella` y `huella_evidencia` |
+| v4.9 – v4.13 | Contribuyentes con FK obligatoria y `regimen_vigente()`, plantillas recurrentes completas, `catalogo_obligaciones` con `dias_no_habiles` y `terminacion_cuit`, feriados 2026, y un régimen `historico` que sigue siendo válido. Ver [`systems/praxia-agente-fiscal`](../../systems/praxia-agente-fiscal/) |
 
 ### Las reglas que no dependen de nadie
 
@@ -388,7 +389,7 @@ La clave de cifrado, además, **vive fuera del volumen** — corrección aplicad
 
 ## Cómo se prueba todo esto
 
-554 casos en 27 archivos, con `node --test` y un harness de **PGlite que replica el esquema real**. No hay mocks de la base: el DDL de verdad corre en cada test.
+606 casos en verde, 0 salteados, con `node --test` y un harness de **PGlite que replica el esquema real**. No hay mocks de la base: el DDL de verdad corre en cada test.
 
 La cobertura incluye explícitamente sanitización, datos sensibles, normalización de montos ambiguos, separador decimal, tipo de cambio, transferencias y sus guards, migraciones v4.6 y v4.7, y lectura fiscal en JS y en SQL.
 

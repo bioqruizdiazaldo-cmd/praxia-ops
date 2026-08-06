@@ -138,7 +138,7 @@ Demonstrating that it does what it claims, with numbers.
 
 **Gate G5:** definition of done.
 
-**Worked example — 554 cases against the real schema.** Twenty-seven test files running on an embedded PostgreSQL harness that executes the actual DDL rather than a mock. Coverage includes ambiguous amounts, decimal separators, date resolution, exchange rates, sanitisation, sensitive-data handling, transfer guards, and two schema migrations. When a later migration made a status column derived rather than stored, the tests said exactly where it broke.
+**Worked example — 606 cases against the real schema.** A suite running on an embedded PostgreSQL harness that executes the actual DDL rather than a mock. Coverage includes ambiguous amounts, decimal separators, date resolution, exchange rates, sanitisation, sensitive-data handling, transfer guards, and two schema migrations. When a later migration made a status column derived rather than stored, the tests said exactly where it broke.
 
 **The best example — the general search revalidation (2026-07-27).** Declared bar: 7 out of 7. Actual result: **2 out of 7**. The component was built and behaving reasonably. It was **not shipped**.
 

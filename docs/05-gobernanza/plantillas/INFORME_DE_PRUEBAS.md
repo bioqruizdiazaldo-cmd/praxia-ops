@@ -106,7 +106,7 @@ y se dijo cuál de los dos. Sin eso, un FAIL se convierte en una excusa.
 
 - [ ] Lo que funcionaba antes sigue funcionando
 - [ ] La suite completa corrió, no sólo los casos nuevos
-- [ ] Conteo total de la suite: <!-- p. ej. 554/554 -->
+- [ ] Conteo total de la suite: <!-- p. ej. 606/606 -->
 
 ## 7. Participación de agentes de IA
 

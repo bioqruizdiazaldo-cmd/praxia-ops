@@ -10,7 +10,7 @@ CÓMO USAR ESTA PLANTILLA
    Bien: "PostgreSQL propio en vez de Supabase"
 3. Un ADR no se edita cuando la decisión cambia: se marca como superada
    y se escribe uno nuevo. El historial de decisiones es el valor
-4. Ver los nueve ADR reales del proyecto en ../../04-decisiones/
+4. Ver los trece ADR reales del proyecto en ../../04-decisiones/
 -->
 
 | Campo | Valor |

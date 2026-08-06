@@ -1,6 +1,6 @@
 # Línea de tiempo
 
-Reconstrucción día por día de la construcción de PraxIA Ops, del 10 de julio al 5 de agosto de 2026, agrupada por las cuatro etapas del proyecto.
+Reconstrucción día por día de la construcción de PraxIA Ops, del 10 de julio al 6 de agosto de 2026, agrupada por las cuatro etapas del proyecto.
 
 Cada fila declara el estado de su evidencia. Ver [cómo leer las tablas](README.md#cómo-leer-las-tablas) si venís directo a este archivo.
 
@@ -71,9 +71,9 @@ Es también la etapa con los dos episodios más citados del repositorio. El 25 d
 
 ---
 
-## Etapa 4 — Producto (28 de julio al 5 de agosto)
+## Etapa 4 — Producto (28 de julio al 6 de agosto)
 
-Nueve días de consolidación. La etapa arranca con un checkpoint incómodo: había 3275 líneas de JavaScript y 33 migraciones SQL en producción **sin ningún control de versiones**. El commit inicial de PraxIA Finanzas es del 28 de julio, once días después de que empezara a existir código.
+Diez días de consolidación. La etapa arranca con un checkpoint incómodo: había 3275 líneas de JavaScript y 33 migraciones SQL en producción **sin ningún control de versiones**. El commit inicial de PraxIA Finanzas es del 28 de julio, once días después de que empezara a existir código.
 
 A partir de ahí el trabajo cambia de naturaleza: migraciones numeradas y probadas, servidor MCP recuperado y versionado, contrato formal entre módulos, línea base de gobernanza en 18 documentos, y un post-mortem por drift entre repositorio y servidor. La etapa cierra con un agente que propone clasificaciones fiscales aprendiendo exclusivamente de las decisiones previas de su dueño.
 
@@ -89,10 +89,13 @@ A partir de ahí el trabajo cambia de naturaleza: migraciones numeradas y probad
 | 2026-08-03 | Corte de runtime: 217 workflows registrados, 25 activos, 25 archivados, 125 con nomenclatura de laboratorio. Orquestador en 51 nodos. 377 ejecuciones conservadas, 343 exitosas y 19 fallidas en 7 días | Los números del corte son el argumento del TO-BE: un runtime donde el 58% de los workflows son de laboratorio no puede ser la fuente de verdad | `Verificado` |
 | 2026-08-04 | **Contrato Finanzas↔Fiscal v1.0 aprobado**. Capa de lectura fiscal con 9 operaciones. Adenda del ADR que resuelve el tratamiento USD/ARS | Formalizar el contrato entre dos módulos del mismo sistema, con versión propia, permite cambiar un lado sin adivinar qué rompe del otro | `Verificado` |
 | 2026-08-05 | **Puesta al día de producción v4.4 → v4.6**. Se descubre que producción estaba **tres migraciones atrás desde el 31/07** porque *"nadie había mirado el servidor, solo el repositorio"*. Backup verificado, migraciones con `ON_ERROR_STOP=1` en transacción, verificación de no-regresión 25 → 35 tablas | Cinco días de drift silencioso. El repositorio estaba impecable y producción atrasada: la disciplina de versionado no reemplaza la verificación del estado desplegado. Ver [post-mortem](../06-runbooks/postmortem-drift-produccion.md) | `Verificado` |
-| 2026-08-05 | Migración v4.7: `estado_fiscal` derivado — `movimiento_estado_fiscal_derivado` y `cierre_transicion_valida` impiden que el estado fiscal diverja de `ambito` + `deducible` | Un campo que puede divergir de los campos que lo determinan es un bug esperando fecha. La solución fue derivarlo en la base, no recordarlo en la aplicación | `Verificado` |
-| 2026-08-05 | **Migración v4.8: propuestas fiscales**. Tabla `fiscal_propuestas` con triggers `propuesta_nace_pendiente`, `propuesta_contenido_inmutable` y `propuesta_transicion_valida`. Campos `huella` y `huella_evidencia` | *"Un agente que puede repreguntar sin límite termina consiguiendo el 'sí' por cansancio."* La huella impide insistir con lo mismo; la huella de evidencia impide aprobar algo caducado | `Verificado` |
+| 2026-08-05 | **Incidente `estado_fiscal` divergente**: 22 movimientos quedan con `ambito` y `deducible` correctos y `estado_fiscal='sin_clasificar'`. El agente los ve clasificados y el cierre los sigue marcando como bloqueantes. El mismo día se verifica que una ruta HTTP aceptaba marcar como `presentado` un período recién abierto | *"Dos partes del sistema, dos respuestas distintas a la misma pregunta, sin que nada avisara de la contradicción."* Ver [post-mortem](../06-runbooks/postmortem-estado-fiscal-divergente.md) | `Verificado` |
+| 2026-08-05 | Migración v4.7: `estado_fiscal` derivado — `movimiento_estado_fiscal_derivado` y `cierre_transicion_valida` impiden que el estado fiscal diverja de `ambito` + `deducible`. **492 tests** | Un campo que puede divergir de los campos que lo determinan es un bug esperando fecha. La solución fue derivarlo en la base, no recordarlo en la aplicación | `Verificado` |
+| 2026-08-05 | **Migración v4.8: propuestas fiscales**. Tabla `fiscal_propuestas` con triggers `propuesta_nace_pendiente`, `propuesta_contenido_inmutable` y `propuesta_transicion_valida`. Campos `huella` y `huella_evidencia`. Dos detectores nuevos (11 → 13). **606 tests verdes, 0 salteados** | *"Un agente que puede repreguntar sin límite termina consiguiendo el 'sí' por cansancio."* La huella impide insistir con lo mismo; la huella de evidencia impide aprobar algo caducado | `Verificado` |
 | 2026-08-05 | `fiscal_motor.mjs`: el agente propone clasificaciones a partir de precedentes del propio dueño — *"de las decisiones anteriores de Aldo. De ningún otro lado. El agente mejora a medida que Aldo decide, sin que nadie lo reentrene. Y el primer mes propone poco, que es lo correcto — todavía no sabe nada"* | Aprendizaje por precedente explícito y auditable, sin reentrenamiento y sin embeddings. Que el sistema proponga poco al principio es la conducta correcta, no una limitación | `Verificado` |
 | 2026-08-05 | Último export de memoria verificado (02:30 UTC): 2 proyectos, 26 hechos, 4 tareas, 1 deduplicada, 0 secretos omitidos | El contador de secretos omitidos en el export es una métrica de seguridad, no de volumen: cero significa que el gate no tuvo que actuar, no que no exista | `Verificado` |
+| 2026-08-05/06 | **Serie v4.9 → v4.13 aplicada y desplegada**: contribuyentes con FK real y aislamiento entre ellos (v4.9), plantillas recurrentes completas (v4.10), catálogo de obligaciones con días no hábiles y vencimiento por terminación de CUIT (v4.11), feriados 2026 (v4.12) y un régimen `historico` que sigue siendo válido (v4.13). Producción queda en **v4.13**, **39 tablas**. Incidente de despliegue por un Dockerfile con la lista de archivos escrita a mano, y rollback | La v4.13 corrige un filtro que descartaba regímenes históricos: el sistema respondía *"no hay condición fiscal vigente"* para un período en el que sí la había. Es el patrón de la falla silenciosa — una respuesta plausible y equivocada. Ver [límites y deudas](../../systems/praxia-agente-fiscal/limites-y-deudas.md) | `Verificado` |
+| 2026-08-06 | Publicación del subsistema [Agente Fiscal](../../systems/praxia-agente-fiscal/): contrato de solo lectura, motor de precedentes, propuestas con doble huella y separación de credenciales | *"La separación no descansa en que el agente se porte bien, descansa en que no tenga la credencial."* El disparo mensual automático en n8n sigue pendiente: el workflow es un stub con trigger manual | `Verificado` |
 
 ---
 
@@ -100,8 +103,8 @@ A partir de ahí el trabajo cambia de naturaleza: migraciones numeradas y probad
 
 Tres cosas que conviene decir explícitamente:
 
-- **No hay separación de ambientes en ningún punto de estos 27 días.** Todo pasó en producción. Los inventarios, canaries y backups fueron la mitigación; no son un reemplazo.
+- **No hay separación de ambientes en ningún punto de estos 28 días.** Todo pasó en producción. Los inventarios, canaries y backups fueron la mitigación; no son un reemplazo.
 - **Las horas exactas sólo están donde quedaron registradas** (14/07 23:05, 25/07 18:25 ART, 25/07 23:18, 05/08 02:30 UTC). Para el resto la granularidad es el día, y no se inventaron horarios.
 - **Los proyectos paralelos avanzaron poco y se declara así.** AI-Command-Center sigue en Fase 0 con cero commits; Arquitecto-IA-Redes son notas; IA_KNOWLEDGE_HUB está congelado desde el 17/07.
 
-> Última verificación: 2026-08-05
+> Última verificación: 2026-08-06

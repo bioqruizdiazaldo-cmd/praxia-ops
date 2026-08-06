@@ -46,7 +46,7 @@ Ese resultado no es mérito del proceso: es circunstancia. Las funcionalidades d
 | Tres migraciones acumuladas aplicadas juntas | Se detectó a las tres; a las diez habría sido mucho peor |
 | Falsa confianza en los tests | Los tests corrían contra el esquema del repositorio, que estaba bien. **Verde en tests, atrasado en producción** |
 
-Ese último punto es el más incómodo. Los 554 tests estaban en verde todo el tiempo. No podían detectar esto, porque prueban el esquema del repositorio con PGlite y el problema estaba justamente en la diferencia entre repositorio y servidor. **Una suite de tests verde no dice nada sobre el estado de producción.**
+Ese último punto es el más incómodo. La suite de tests estaba en verde todo el tiempo. No podían detectar esto, porque prueban el esquema del repositorio con PGlite y el problema estaba justamente en la diferencia entre repositorio y servidor. **Una suite de tests verde no dice nada sobre el estado de producción.**
 
 ## Causa
 
@@ -153,7 +153,7 @@ Coherente con el principio de la línea base: *"Los agentes de IA pueden propone
 | 5 | Chequeo automático y periódico de correspondencia entre migraciones del repositorio y `schema_migrations` del servidor | **Pendiente** | **Alta** |
 | 6 | Alerta cuando la brecha supere una migración | **Pendiente** | Alta |
 | 7 | Ambiente de staging separado | **Pendiente** | Media |
-| 8 | Integración continua que corra los 554 tests sin intervención | **Pendiente** | Media |
+| 8 | Integración continua que corra los 606 tests sin intervención | **Pendiente** | Media |
 | 9 | Ensayo de restauración de backup documentado | **Pendiente** | Media |
 
 Las acciones 5 y 6 son las que atacan la causa directamente. Sin ellas, la mitigación actual es "acordarse de mirar", que es exactamente lo que falló.
@@ -172,7 +172,7 @@ Ocho días antes el problema era que no había repositorio. Se resolvió bien, y
 
 ### 3. Los tests verdes no son evidencia de despliegue
 
-Los 554 tests corren contra el esquema del repositorio con una base embebida. Por diseño no pueden ver producción. Confundir "los tests pasan" con "producción está bien" es un error de categoría.
+Los 606 tests corren contra el esquema del repositorio con una base embebida. Por diseño no pueden ver producción. Confundir "los tests pasan" con "producción está bien" es un error de categoría.
 
 ### 4. Sin señal automática, el tiempo de detección lo decide el azar
 

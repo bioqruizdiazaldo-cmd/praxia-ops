@@ -8,7 +8,7 @@ Descripción del contrato HTTP de PraxIA Finanzas: recursos, familias de endpoin
 
 ## Lo primero: el estado de las versiones
 
-La API declara **PraxIA Finanzas 3.6.0** en su OpenAPI. El esquema de base está en **v4.8**. **El contrato publicado va atrás del sistema real** y está anotado como deuda técnica en la [ficha del subsistema](../../systems/praxia-finanzas/).
+La API declara **PraxIA Finanzas 3.6.0** en su OpenAPI. El esquema de base está en **v4.13**. **El contrato publicado va atrás del sistema real** y está anotado como deuda técnica en la [ficha del subsistema](../../systems/praxia-finanzas/).
 
 Se dice acá y no en una nota al pie porque es exactamente el tipo de cosa que un repositorio de portafolio esconde.
 
