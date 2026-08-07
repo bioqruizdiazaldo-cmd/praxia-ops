@@ -1,0 +1,189 @@
+{
+  "createdAt": "2026-01-02T10:00:00.000Z",
+  "updatedAt": "2026-08-06T18:41:07.512Z",
+  "id": "wfSinteticoLimpio01",
+  "name": "Ejemplo — Resumen diario de tareas",
+  "active": true,
+  "isArchived": false,
+  "triggerCount": 1,
+  "versionId": "11111111-2222-3333-4444-555555555555",
+  "meta": {
+    "instanceId": "instancia-sintetica-de-ejemplo"
+  },
+  "pinData": {
+    "Consultar tareas abiertas": [
+      {
+        "json": {
+          "nota": "Datos pegados durante el desarrollo. El normalizador los saca siempre.",
+          "tareas": 3
+        }
+      }
+    ]
+  },
+  "staticData": {
+    "ultimo_id_visto": 4821
+  },
+  "tags": [
+    {
+      "createdAt": "2026-01-02T10:00:00.000Z",
+      "id": "tag-sintetico-2",
+      "name": "ejemplo",
+      "updatedAt": "2026-01-02T10:00:00.000Z"
+    },
+    {
+      "createdAt": "2026-01-02T10:00:00.000Z",
+      "id": "tag-sintetico-1",
+      "name": "documentacion",
+      "updatedAt": "2026-01-02T10:00:00.000Z"
+    }
+  ],
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "saveManualExecutions": true
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "field": "days"
+            }
+          ]
+        }
+      },
+      "id": "nodo-sintetico-aaaa",
+      "name": "Disparador diario 08:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-260, 40]
+    },
+    {
+      "parameters": {
+        "url": "https://api.servicio-de-ejemplo.example.com/v1/tareas",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $credentials.httpHeaderAuth.value }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "nodo-sintetico-bbbb",
+      "name": "Consultar tareas abiertas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [40, 40],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "credSinteticaHttp01",
+          "name": "Servicio de ejemplo — Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "asignacion-1",
+              "name": "resumen",
+              "type": "string",
+              "value": "={{ $json.tareas.length }} tarea(s) abiertas al {{ $now.toFormat('dd/LL/yyyy') }}"
+            },
+            {
+              "id": "asignacion-2",
+              "name": "contacto_soporte",
+              "type": "string",
+              "value": "soporte@example.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "nodo-sintetico-cccc",
+      "name": "Armar resumen",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [340, 40]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.destinatario_chat_id }}",
+        "text": "={{ $json.resumen }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "nodo-sintetico-dddd",
+      "name": "Avisar por Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [640, 40],
+      "webhookId": "99999999-8888-7777-6666-555555555555",
+      "credentials": {
+        "telegramApi": {
+          "id": "credSinteticaTelegram01",
+          "name": "Bot de ejemplo"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Disparador diario 08:00": {
+      "main": [
+        [
+          {
+            "node": "Consultar tareas abiertas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar tareas abiertas": {
+      "main": [
+        [
+          {
+            "node": "Armar resumen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar resumen": {
+      "main": [
+        [
+          {
+            "node": "Avisar por Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "shared": [
+    {
+      "role": "workflow:owner",
+      "project": {
+        "id": "proyecto-sintetico",
+        "name": "Persona De Ejemplo <persona@example.com>"
+      }
+    }
+  ]
+}

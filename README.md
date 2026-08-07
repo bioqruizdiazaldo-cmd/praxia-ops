@@ -70,6 +70,12 @@ Este repositorio es la **documentación ordenada, sanitizada y verificable** de 
 | [`artifacts/prompts`](artifacts/prompts/) | Prompts de sistema de los agentes, sanitizados |
 | [`artifacts/openapi`](artifacts/openapi/) | Contrato OpenAPI de la API financiera |
 
+### Herramientas
+
+| Carpeta | Qué hace |
+|---|---|
+| [`tools/n8n-versionado`](tools/n8n-versionado/) | Exporta workflows de n8n, normaliza el JSON para que el diff sea legible, verifica que no lleven secretos ni datos personales y genera su manifiesto. Cero dependencias, 65 tests |
+
 ---
 
 ## Stack

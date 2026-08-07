@@ -1,0 +1,160 @@
+{
+  "_plantilla": "Los marcadores __SENUELO_*__ los reemplaza tests/senuelos.mjs en tiempo de ejecucion. Se hace asi para que ningun archivo del repositorio contenga una cadena con forma de secreto, ni siquiera falsa.",
+  "_fixture": "SINTÉTICO. Todos los problemas de este archivo están sembrados a propósito para probar el verificador. Ningún valor corresponde a un sistema, una instancia, una credencial ni una persona reales.",
+  "createdAt": "2026-03-11T09:15:00.000Z",
+  "updatedAt": "2026-08-06T19:02:44.001Z",
+  "id": "wfSinteticoSucio02",
+  "name": "Ejemplo — Alta de contacto (con problemas sembrados)",
+  "active": true,
+  "triggerCount": 4,
+  "versionId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "meta": {
+    "instanceId": "instancia-sintetica-de-ejemplo"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alta-de-contacto",
+        "options": {}
+      },
+      "id": "nodo-sucio-aaaa",
+      "name": "Webhook de alta",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-300, 0],
+      "webhookId": "dddddddd-cccc-bbbb-aaaa-000000000000"
+    },
+    {
+      "parameters": {
+        "url": "http://10.20.30.40:5678/api/v1/contactos?api_key=__SENUELO_QUERY_STRING__",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer __SENUELO_OPENAI__"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "nodo-sucio-bbbb",
+      "name": "Registrar en el CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO contactos (nombre, cuit) VALUES ($1, $2)",
+        "options": {
+          "connectionString": "__SENUELO_CONEXION__"
+        }
+      },
+      "id": "nodo-sucio-cccc",
+      "name": "Guardar en la base",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [300, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "asignacion-1",
+              "name": "cuit_del_titular",
+              "type": "string",
+              "value": "20-11111111-2"
+            },
+            {
+              "id": "asignacion-2",
+              "name": "correo_de_aviso",
+              "type": "string",
+              "value": "usuario.demo@dominio-inventado.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "nodo-sucio-dddd",
+      "name": "Completar datos del titular",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [600, 0]
+    },
+    {
+      "parameters": {
+        "chatId": "-1001234567890",
+        "text": "=Nuevo contacto: {{ $json.nombre }}",
+        "additionalFields": {}
+      },
+      "id": "nodo-sucio-eeee",
+      "name": "Avisar al grupo",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [900, 0],
+      "webhookId": "eeeeeeee-ffff-0000-1111-222222222222",
+      "credentials": {
+        "telegramApi": {
+          "id": "credSinteticaTelegram02",
+          "name": "Bot de ejemplo",
+          "data": {
+            "accessToken": "__SENUELO_TELEGRAM__"
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook de alta": {
+      "main": [
+        [
+          {
+            "node": "Registrar en el CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar en el CRM": {
+      "main": [
+        [
+          {
+            "node": "Guardar en la base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar en la base": {
+      "main": [
+        [
+          {
+            "node": "Completar datos del titular",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Completar datos del titular": {
+      "main": [
+        [
+          {
+            "node": "Avisar al grupo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -33,7 +33,7 @@ Nada pasa a publicable hasta llegar a **Verificado**.
 
 > **Seguimiento.** Cada pendiente de esta hoja tiene su issue en el [tablero del roadmap](https://github.com/users/bioqruizdiazaldo-cmd/projects/2), etiquetado por estado de evidencia y por área. Esta página explica *por qué* algo falta; el tablero rastrea *cuándo* se resuelve.
 >
-> Los tres marcados [`bloqueante`](https://github.com/bioqruizdiazaldo-cmd/praxia-ops/issues?q=is%3Aissue+is%3Aopen+label%3Abloqueante) traban al resto: sin ambientes separados, sin workflows versionados y sin un ensayo de restauración, cualquier otra mejora se construye sobre algo que no se puede reproducir ni recuperar.
+> Los tres marcados [`bloqueante`](https://github.com/bioqruizdiazaldo-cmd/praxia-ops/issues?q=is%3Aissue+is%3Aopen+label%3Abloqueante) traban al resto: sin ambientes separados, sin workflows versionados y sin un ensayo de restauración, cualquier otra mejora se construye sobre algo que no se puede reproducir ni recuperar. El segundo avanzó a **Parcial**: la herramienta de versionado ya existe y está probada; lo que falta es la práctica de usarla.
 
 ---
 
@@ -59,6 +59,8 @@ Nada pasa a publicable hasta llegar a **Verificado**.
 | Motor de propuestas por precedente verificable, sin inferencia | Verificado | [`systems/praxia-agente-fiscal/motor-de-precedentes.md`](systems/praxia-agente-fiscal/motor-de-precedentes.md) |
 | Propuestas con huella e inmutabilidad del contenido decidido | Verificado | [`systems/praxia-agente-fiscal/propuestas-y-huellas.md`](systems/praxia-agente-fiscal/propuestas-y-huellas.md) |
 | Separación de credenciales que impide la autoaprobación | Verificado | [`systems/praxia-agente-fiscal/seguridad-y-permisos.md`](systems/praxia-agente-fiscal/seguridad-y-permisos.md) |
+| Toolkit de versionado de workflows: exporta, normaliza, verifica y manifiesta | Verificado | [`tools/n8n-versionado`](tools/n8n-versionado/) |
+| Auditoría de seguridad con remediación y procedimiento de rotación | Verificado | [`docs/05-gobernanza/auditar-antes-de-publicar.md`](docs/05-gobernanza/auditar-antes-de-publicar.md) |
 
 ---
 
@@ -74,12 +76,15 @@ Hoy producción se usó también como laboratorio: 125 workflows con nomenclatur
 **Qué desbloquea:** todo lo demás. Sin esto, cualquier prueba de carga o de regresión toca el sistema del que dependen las finanzas y la agenda reales.
 **Publicable cuando:** exista y se pueda mostrar el flujo `draft → test → staging → production` con un caso real.
 
-### 2. Workflows versionados en git · **No existe** · bloqueante
+### 2. Workflows versionados en git · **Parcial** · bloqueante
 
 El [TO-BE](docs/01-arquitectura/estado-objetivo-to-be.md) dice que el repositorio debería ser la fuente de verdad y el runtime un despliegue. Hoy es al revés: la verdad vive en n8n.
 
-**Qué haría falta:** exportador que normalice el JSON (sacando metadata de runtime que ensucia el diff), el [manifiesto de 11 campos](artifacts/workflows-n8n/manifiesto-de-workflow.md) por workflow, y el pipeline de publicación automatizado.
-**Publicable cuando:** haya un `n8n-git-versioning-toolkit` con exportador, normalizador y ejemplo reproducible. Hoy sólo está la guía, no la herramienta.
+**Lo que ya existe:** la herramienta. [`tools/n8n-versionado/`](tools/n8n-versionado/) exporta desde la API con paginación, normaliza el JSON quitando los catorce campos de runtime que ensucian el diff, verifica secretos y datos personales antes de commitear, y genera y valida el [manifiesto de 11 campos](artifacts/workflows-n8n/manifiesto-de-workflow.md). Cero dependencias, 65 tests, y dos fixtures — uno limpio y uno con problemas sembrados — que el CI corre en cada push para comprobar que el verificador sigue detectando lo que dice detectar.
+
+**Lo que falta:** usarla. Ningún workflow real está versionado todavía, y el pipeline de publicación no está automatizado. Tener el exportador y no tener los workflows en git es exactamente la distancia entre una herramienta y una práctica.
+
+**Publicable cuando:** los workflows de producción estén en el repositorio con su manifiesto, y un cambio pueda ir de un commit al runtime sin edición manual en la interfaz.
 
 ### 3. Backups con off-site y ensayo de restauración · **Parcial** · bloqueante
 

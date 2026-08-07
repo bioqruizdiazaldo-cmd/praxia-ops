@@ -6,6 +6,33 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). La
 
 ---
 
+## [0.3.0] — 2026-08-06
+
+Seguridad y herramientas. Sale de una auditoría de la carpeta de trabajo privada que buscaba filtraciones y encontró algo distinto: no había secretos publicados, pero sí permisos de agente que en la práctica entregaban el servidor de producción.
+
+### Agregado
+
+- **`tools/n8n-versionado/`** — la herramienta que el bloqueante 2 de la hoja de ruta pedía y que hasta ahora sólo estaba descrita. Exporta desde la API de n8n con paginación, normaliza el JSON quitando los catorce campos de runtime que ensucian el diff, verifica secretos y datos personales antes de commitear, y genera y valida el manifiesto de 11 campos. Cero dependencias, 65 tests, dos fixtures — uno limpio y uno con problemas sembrados.
+- **Gobernanza**: [auditar antes de publicar](docs/05-gobernanza/auditar-antes-de-publicar.md), los nueve controles con su triaje de falsos positivos; y [permisos de agente](docs/05-gobernanza/permisos-de-agente.md), la precedencia, las cuatro trampas de sintaxis y los límites reales del mecanismo.
+- **Runbooks**: [rotar una credencial expuesta](docs/06-runbooks/rotar-una-credencial-expuesta.md) — ocho pasos, criterio de éxito 401 o 403 y no "ya lo moví"; [publicar una actualización](docs/06-runbooks/publicar-una-actualizacion.md) — el circuito completo con su tabla de fallas; y [sacar datos operativos de la bóveda](docs/06-runbooks/sacar-datos-operativos-de-la-boveda.md) — la limpieza de coordenadas y volcados de una carpeta de notas sincronizada.
+- **Resúmenes en inglés** al principio de los documentos clave, para que el repositorio se pueda leer sin español.
+- **CI**: un job nuevo que corre los tests del toolkit y comprueba que su verificador sigue detectando sus propios señuelos. Si dejara de hacerlo, la compuerta que protege cada publicación estaría rota sin que nadie se entere.
+- **`tools/n8n-versionado/tests/senuelos.mjs`** — los valores con forma de secreto que prueban el verificador se arman en tiempo de ejecución, uniendo pedazos. Ningún archivo del repositorio contiene una cadena con forma de secreto, ni real ni falsa.
+
+### Cambiado
+
+- **Bloqueante 2 de la hoja de ruta: `No existe` → `Parcial`.** La herramienta existe y está probada; ningún workflow real está versionado todavía. Tener el exportador y no tener los workflows en git es la distancia entre una herramienta y una práctica, y la hoja de ruta ahora lo dice así.
+- Los índices de gobernanza y de runbooks, con un principio nuevo: cada dato operativo vive en un solo lugar, y ese lugar no es la carpeta que sincroniza.
+
+### Seguridad
+
+Sin filtraciones en lo publicado: se verificó contra el remoto, clonando. Los hallazgos fueron todos del lado privado y se corrigieron ahí. El que importa, y que queda documentado porque le puede pasar a cualquiera que trabaje con agentes:
+
+- **Reglas de permiso terminadas en comodín.** Aprobando comandos puntuales durante sesiones largas, el prefijo común se fue acortando hasta que quedaron reglas de la forma `Bash(ssh ... root@<host> ' *)`. Leída literalmente, esa regla autoriza cualquier comando como root en producción, sin preguntar. No se puso ahí con mala intención: se acumuló. La corrección está descrita en el runbook, y quitar una regla de la lista de permitidos no prohíbe nada — sólo devuelve la pregunta.
+- **Cero excepciones en el escaneo de secretos.** La protección de push de GitHub rechazó esta misma versión por un token de Slack **falso** escrito literal en un test. Hizo bien: un escáner que distinguiera secretos de verdad de secretos de mentira no serviría de nada. En vez de pedir la excepción se cambió el código, y hoy ni el escaneo local, ni el del CI, ni el de GitHub tienen lista de exentos.
+
+---
+
 ## [0.2.0] — 2026-08-06
 
 Incorporación del subsistema Agente Fiscal y puesta al día de los números del repositorio contra el estado real de producción.

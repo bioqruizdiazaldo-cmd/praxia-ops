@@ -24,6 +24,12 @@ jobs:
         run: |
           set -euo pipefail
           fallo=0
+          # Sin excepciones, ni siquiera para los tests. Los señuelos que prueban
+          # el verificador del toolkit se arman en tiempo de ejecución uniendo
+          # pedazos (ver tools/n8n-versionado/tests/senuelos.mjs), así que ningún
+          # archivo de este repositorio contiene una cadena con forma de secreto
+          # —ni real ni falsa— y este escaneo no necesita lista de exentos.
+          # Una regla sin excepciones es una regla que se puede verificar.
           buscar() {
             local etiqueta="$1"; shift
             local patron="$1"; shift
@@ -57,6 +63,46 @@ jobs:
             exit 1
           fi
           echo "Escaneo limpio."
+
+  toolkit:
+    name: Toolkit de versionado de n8n
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Tests del toolkit
+        working-directory: tools/n8n-versionado
+        run: node --test
+
+      - name: El fixture limpio pasa y el sucio no
+        working-directory: tools/n8n-versionado
+        run: |
+          set -uo pipefail
+          # El workflow con problemas no está versionado: se arma desde una
+          # plantilla, reemplazando marcadores por señuelos ensamblados en
+          # tiempo de ejecución. Por eso hay que materializarlo antes.
+          sucio_ruta=$(node -e "
+            import('./tests/senuelos.mjs')
+              .then((m) => m.materializarWorkflowSucio(process.env.RUNNER_TEMP || '/tmp'))
+              .then((p) => console.log(p));
+          ")
+          node cli.mjs verificar tests/fixtures/workflow-limpio.json > /dev/null
+          limpio=$?
+          node cli.mjs verificar "$sucio_ruta" > /dev/null 2>&1
+          sucio=$?
+          echo "fixture limpio -> código $limpio (esperado 0)"
+          echo "fixture con problemas -> código $sucio (esperado 1)"
+          # Si el verificador dejara de detectar sus propios señuelos, la
+          # compuerta que protege cada publicación estaría rota sin que nadie
+          # se entere. Este paso es lo que impide que eso pase en silencio.
+          if [ "$limpio" -ne 0 ] || [ "$sucio" -eq 0 ]; then
+            echo "::error::El escáner del toolkit no se comporta como se espera"
+            exit 1
+          fi
 
   enlaces:
     name: Enlaces internos de la documentación

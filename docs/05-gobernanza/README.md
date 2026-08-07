@@ -32,6 +32,8 @@ La frase que resume el límite de lo que un agente puede ser:
 | [Acuerdo de trabajo con agentes](acuerdo-de-trabajo-con-agentes.md) | Qué puede hacer un agente sin permiso, qué requiere permiso y qué no puede hacer nunca |
 | [Versionado no-code](versionado-no-code.md) | Cómo se versiona un workflow visual que no tiene diff legible |
 | [Política de publicación](politica-de-publicacion.md) | Qué se puede publicar y cómo se sanitiza |
+| [Auditar antes de publicar](auditar-antes-de-publicar.md) | Los nueve controles para revisar una carpeta de trabajo compartida con agentes: secretos en la historia de git, credenciales, datos personales, dumps, transcripciones y la configuración de permisos del propio agente |
+| [Permisos de agente](permisos-de-agente.md) | Por qué una lista que sólo dice "sí" no es una política: la precedencia `deny` → `ask` → `allow`, las cuatro trampas de sintaxis y los límites reales de lo que una regla protege |
 
 ### Checklists
 
