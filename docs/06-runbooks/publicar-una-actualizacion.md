@@ -91,6 +91,7 @@ Un token de publicación tiene una vida útil de una sesión. Si sobrevive a la 
 | `Resource not accessible by personal access token` al tocar etiquetas | Las etiquetas exigen **dos** permisos: Issues y Pull requests, ambos de escritura | La cabecera `X-Accepted-GitHub-Permissions` de la respuesta dice exactamente cuál falta. Leerla en vez de adivinar |
 | "Sin cambios para commitear" cuando esperabas cambios | El commit ya se había hecho en una corrida anterior que falló después | Normal. El push de esta corrida lo sube |
 | El script dice OK pero el remoto no cambió | Un error se tragó en un `catch` | Verificar siempre con el paso 4. Y arreglar el `catch` |
+| El push entra pero el CI queda en rojo, y el job falla en segundos sin imprimir nada | GitHub Actions corre cada `run` con `bash -e`. Un paso que **espera** que un comando falle — por ejemplo comprobar que el escáner sale con 1 — muere en la línea del comando, antes de poder leer `$?` | Escribir `cmd && x=0 \|\| x=$?` en vez de `cmd` seguido de `x=$?`. Y al reproducir un job localmente, invocarlo con `bash --noprofile --norc -e -o pipefail`, no con un `bash` común: si no, pasa local y falla remoto |
 
 ---
 

@@ -90,10 +90,16 @@ jobs:
               .then((m) => m.materializarWorkflowSucio(process.env.RUNNER_TEMP || '/tmp'))
               .then((p) => console.log(p));
           ")
-          node cli.mjs verificar tests/fixtures/workflow-limpio.json > /dev/null
-          limpio=$?
-          node cli.mjs verificar "$sucio_ruta" > /dev/null 2>&1
-          sucio=$?
+          # OJO con la forma de capturar el código de salida.
+          #
+          # GitHub Actions ejecuta cada `run` con `bash -e`, y este paso espera
+          # a propósito que un comando falle: el fixture sucio TIENE que salir
+          # con 1. Escrito como `node ...` y después `x=$?`, `-e` mata el script
+          # en la línea del node y el job muere en silencio, sin imprimir nada.
+          # Pasó exactamente eso. La forma `cmd && x=0 || x=$?` convierte la
+          # llamada en un comando compuesto, y ahí `-e` no dispara.
+          node cli.mjs verificar tests/fixtures/workflow-limpio.json > /dev/null && limpio=0 || limpio=$?
+          node cli.mjs verificar "$sucio_ruta" > /dev/null 2>&1 && sucio=0 || sucio=$?
           echo "fixture limpio -> código $limpio (esperado 0)"
           echo "fixture con problemas -> código $sucio (esperado 1)"
           # Si el verificador dejara de detectar sus propios señuelos, la
